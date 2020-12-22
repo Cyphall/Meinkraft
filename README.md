@@ -1,6 +1,7 @@
 # Meinkraft
-This is a Minecraft-like made to experiment with the Nvidia extensions that Vulkanize OpenGL.
-This project therefore requires an Nvidia GPU to run.
+This is a Minecraft-like made to experiment with the Nvidia extensions that Vulkanize OpenGL.<br/>
+This project therefore requires an Nvidia GPU to run.<br/>
+This is a full C++ rewrite of my original C# Meinkraft project.
 
 ### Extensions used in this project
 * GL_ARB_bindless_texture
