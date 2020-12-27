@@ -2,6 +2,8 @@
 #include "World.h"
 #include "Camera.h"
 #include "Toolbox.h"
+#include "GL/NVCommands.h"
+#include "GL/Uniforms.h"
 #include <glad/glad.h>
 #include <glm/gtc/matrix_inverse.hpp>
 

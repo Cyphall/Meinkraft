@@ -10,7 +10,11 @@ _position(position)
 
 Chunk::~Chunk()
 {
-	glDeleteBuffers(1, &_vbo);
+	if (_vbo)
+	{
+		glMakeNamedBufferNonResidentNV(_vbo);
+		glDeleteBuffers(1, &_vbo);
+	}
 }
 
 void Chunk::initializeBlocks(WorldGenerator& worldGenerator)
@@ -273,9 +277,13 @@ void Chunk::transferGeneratedMesh()
 {
 	if (_state != WAITING_MESH_TRANSFER) throw std::runtime_error("A chunk is in an invalid state.");
 	
-	glDeleteBuffers(1, &_vbo);
-	_vbo = 0;
-	_vboAddress = 0;
+	if (_vbo)
+	{
+		glMakeNamedBufferNonResidentNV(_vbo);
+		glDeleteBuffers(1, &_vbo);
+		_vbo = 0;
+		_vboAddress = 0;
+	}
 	
 	if (_temporaryRamBuffer.size() > 0)
 	{

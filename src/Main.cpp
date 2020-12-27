@@ -6,6 +6,7 @@
 #include "World.h"
 #include "Renderer.h"
 #include "Toolbox.h"
+#include <fmt/format.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -15,18 +16,18 @@ void messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLs
 	switch (severity)
 	{
 		case GL_DEBUG_SEVERITY_HIGH:
-			std::cout << "ERROR: " << message << std::endl;
+			std::cout << fmt::format("ERROR {}: {}", id, message) << std::endl;
 			if (IsDebuggerPresent())
 				__debugbreak();
 			break;
 		case GL_DEBUG_SEVERITY_MEDIUM:
-			std::cout << "WARNING: " << message << std::endl;
+			std::cout << fmt::format("WARNING {}: {}", id, message) << std::endl;
 			break;
 		case GL_DEBUG_SEVERITY_LOW:
-			std::cout << "INFO: " << message << std::endl;
+			std::cout << fmt::format("INFO {}: {}", id, message) << std::endl;
 			break;
 //		case GL_DEBUG_SEVERITY_NOTIFICATION:
-//			std::cout << "NOTIF: " << message << std::endl;
+//			std::cout << fmt::format("NOTIF {}: {}", id, message) << std::endl;
 //			break;
 	}
 }
@@ -68,6 +69,7 @@ int main(int argc, char** argv)
 	glEnable(GL_DEBUG_OUTPUT);
 #if _DEBUG
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+//	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 #endif
 	glDebugMessageCallback(messageCallback, nullptr);
 	
