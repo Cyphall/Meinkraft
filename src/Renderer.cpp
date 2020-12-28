@@ -38,20 +38,20 @@ _forwardShader({
 	
 	glCreateBuffers(1, &_texturesBuffer);
 	
-	_textures.emplace_back(std::make_unique<Texture>("stone.png"));
-	_textures.emplace_back(std::make_unique<Texture>("grass.png"));
-	_textures.emplace_back(std::make_unique<Texture>("dirt.png"));
-	_textures.emplace_back(std::make_unique<Texture>("wood.png"));
-	_textures.emplace_back(std::make_unique<Texture>("iron.png"));
+	_textures.emplace_back("stone");
+	_textures.emplace_back("grass");
+	_textures.emplace_back("dirt");
+	_textures.emplace_back("wood");
+	_textures.emplace_back("iron");
 	
-	std::vector<GLuint64> textureHandles;
+	std::vector<BlockTextures::NativeData> textureHandles;
 	textureHandles.reserve(_textures.size());
-	for (const std::unique_ptr<Texture>& texture : _textures)
+	for (const BlockTextures& textures : _textures)
 	{
-		textureHandles.push_back(texture->getBindlessHandle());
+		textureHandles.push_back(textures.getData());
 	}
 	
-	glNamedBufferStorage(_texturesBuffer, textureHandles.size() * sizeof(GLuint64), textureHandles.data(), 0);
+	glNamedBufferStorage(_texturesBuffer, textureHandles.size() * sizeof(BlockTextures::NativeData), textureHandles.data(), 0);
 }
 
 void Renderer::render()

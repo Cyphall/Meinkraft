@@ -3,6 +3,7 @@
 #include "GL/ShaderProgram.h"
 #include "GL/Texture.h"
 #include "Camera.h"
+#include "BlockTextures.h"
 #include <memory>
 
 class Renderer
@@ -21,7 +22,7 @@ private:
 	
 	GLuint _texturesBuffer;
 	
-	std::vector<std::unique_ptr<Texture>> _textures;
+	std::vector<BlockTextures> _textures;
 	
 	void prepare();
 	void renderImpl();

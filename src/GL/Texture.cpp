@@ -24,6 +24,13 @@ Texture::Texture(const std::string& path)
 	glMakeTextureHandleResidentARB(_bindlessHandle);
 }
 
+Texture::Texture(Texture&& other):
+		_size(other._size), _handle(other._handle), _bindlessHandle(other._bindlessHandle)
+{
+	other._handle = 0;
+	other._bindlessHandle = 0;
+}
+
 Texture::~Texture()
 {
 	glDeleteTextures(1, &_handle);

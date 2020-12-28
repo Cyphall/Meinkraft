@@ -36,6 +36,7 @@ out FRAG {
 } frag;
 
 flat out uint Block;
+flat out uint Face;
 
 const vec3 normalLookup[6] = vec3[](
 vec3( 1,  0,  0),
@@ -59,11 +60,12 @@ void main()
 {
     vec3 position = vec3(in_position);
 
-    frag.TexCoords = vec2(in_uv) / 4;
+    frag.TexCoords = vec2(in_uv);
 
     frag.FragPos = vec3(chunkUniforms[gl_DrawID].model * vec4(position, 1.0));
 
     Block = in_block;
+    Face = in_face;
 
     vec3 N = normalize(mat3(chunkUniforms[gl_DrawID].normalMatrix) * normalLookup[in_face]);
     vec3 T = normalize(mat3(chunkUniforms[gl_DrawID].normalMatrix) * tangentLookup[in_face]);

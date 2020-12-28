@@ -53,12 +53,10 @@ void Chunk::generateMesh()
 					vertexBR.position = glm::u8vec3(x+ 1, y+ 0, z+ 0);
 					vertexTR.position = glm::u8vec3(x+ 1, y+ 1, z+ 0);
 					
-					glm::u8vec2 uvOffset(3, 2);
-					
-					vertexBL.uv = uvOffset + glm::u8vec2(0, 0);
-					vertexTL.uv = uvOffset + glm::u8vec2(0, 1);
-					vertexBR.uv = uvOffset + glm::u8vec2(1, 0);
-					vertexTR.uv = uvOffset + glm::u8vec2(1, 1);
+					vertexBL.uv = glm::u8vec2(0, 0);
+					vertexTL.uv = glm::u8vec2(0, 1);
+					vertexBR.uv = glm::u8vec2(1, 0);
+					vertexTR.uv = glm::u8vec2(1, 1);
 					
 					vertexBL.face = 0;
 					vertexTL.face = 0;
@@ -91,12 +89,10 @@ void Chunk::generateMesh()
 					vertexBR.position = glm::u8vec3(x+ 0, y+ 0, z+ 1);
 					vertexTR.position = glm::u8vec3(x+ 0, y+ 1, z+ 1);
 					
-					glm::u8vec2 uvOffset(1, 2);
-					
-					vertexBL.uv = uvOffset + glm::u8vec2(0, 0);
-					vertexTL.uv = uvOffset + glm::u8vec2(0, 1);
-					vertexBR.uv = uvOffset + glm::u8vec2(1, 0);
-					vertexTR.uv = uvOffset + glm::u8vec2(1, 1);
+					vertexBL.uv = glm::u8vec2(0, 0);
+					vertexTL.uv = glm::u8vec2(0, 1);
+					vertexBR.uv = glm::u8vec2(1, 0);
+					vertexTR.uv = glm::u8vec2(1, 1);
 					
 					vertexBL.face = 1;
 					vertexTL.face = 1;
@@ -129,12 +125,10 @@ void Chunk::generateMesh()
 					vertexBR.position = glm::u8vec3(x+ 0, y+ 1, z+ 1);
 					vertexTR.position = glm::u8vec3(x+ 1, y+ 1, z+ 1);
 					
-					glm::u8vec2 uvOffset(1, 3);
-					
-					vertexBL.uv = uvOffset + glm::u8vec2(0, 0);
-					vertexTL.uv = uvOffset + glm::u8vec2(0, 1);
-					vertexBR.uv = uvOffset + glm::u8vec2(1, 0);
-					vertexTR.uv = uvOffset + glm::u8vec2(1, 1);
+					vertexBL.uv = glm::u8vec2(0, 0);
+					vertexTL.uv = glm::u8vec2(0, 1);
+					vertexBR.uv = glm::u8vec2(1, 0);
+					vertexTR.uv = glm::u8vec2(1, 1);
 					
 					vertexBL.face = 2;
 					vertexTL.face = 2;
@@ -167,12 +161,10 @@ void Chunk::generateMesh()
 					vertexBR.position = glm::u8vec3(x+ 1, y+ 0, z+ 1);
 					vertexTR.position = glm::u8vec3(x+ 0, y+ 0, z+ 1);
 					
-					glm::u8vec2 uvOffset(1, 1);
-					
-					vertexBL.uv = uvOffset + glm::u8vec2(0, 0);
-					vertexTL.uv = uvOffset + glm::u8vec2(0, 1);
-					vertexBR.uv = uvOffset + glm::u8vec2(1, 0);
-					vertexTR.uv = uvOffset + glm::u8vec2(1, 1);
+					vertexBL.uv = glm::u8vec2(0, 0);
+					vertexTL.uv = glm::u8vec2(0, 1);
+					vertexBR.uv = glm::u8vec2(1, 0);
+					vertexTR.uv = glm::u8vec2(1, 1);
 					
 					vertexBL.face = 3;
 					vertexTL.face = 3;
@@ -205,12 +197,10 @@ void Chunk::generateMesh()
 					vertexBR.position = glm::u8vec3(x+ 1, y+ 0, z+ 1);
 					vertexTR.position = glm::u8vec3(x+ 1, y+ 1, z+ 1);
 					
-					glm::u8vec2 uvOffset(2, 2);
-					
-					vertexBL.uv = uvOffset + glm::u8vec2(0, 0);
-					vertexTL.uv = uvOffset + glm::u8vec2(0, 1);
-					vertexBR.uv = uvOffset + glm::u8vec2(1, 0);
-					vertexTR.uv = uvOffset + glm::u8vec2(1, 1);
+					vertexBL.uv = glm::u8vec2(0, 0);
+					vertexTL.uv = glm::u8vec2(0, 1);
+					vertexBR.uv = glm::u8vec2(1, 0);
+					vertexTR.uv = glm::u8vec2(1, 1);
 					
 					vertexBL.face = 4;
 					vertexTL.face = 4;
@@ -243,12 +233,10 @@ void Chunk::generateMesh()
 					vertexBR.position = glm::u8vec3(x+ 0, y+ 0, z+ 0);
 					vertexTR.position = glm::u8vec3(x+ 0, y+ 1, z+ 0);
 					
-					glm::u8vec2 uvOffset(0, 2);
-					
-					vertexBL.uv = uvOffset + glm::u8vec2(0, 0);
-					vertexTL.uv = uvOffset + glm::u8vec2(0, 1);
-					vertexBR.uv = uvOffset + glm::u8vec2(1, 0);
-					vertexTR.uv = uvOffset + glm::u8vec2(1, 1);
+					vertexBL.uv = glm::u8vec2(0, 0);
+					vertexTL.uv = glm::u8vec2(0, 1);
+					vertexBR.uv = glm::u8vec2(1, 0);
+					vertexTR.uv = glm::u8vec2(1, 1);
 					
 					vertexBL.face = 5;
 					vertexTL.face = 5;

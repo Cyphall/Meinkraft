@@ -9,7 +9,7 @@ class Texture
 public:
 	explicit Texture(const std::string& path);
 	Texture(const Texture& other) = delete;
-	Texture(Texture&& other) = delete;
+	Texture(Texture&& other);
 	
 	~Texture();
 	
