@@ -21,7 +21,7 @@ void Chunk::initializeBlocks(WorldGenerator& worldGenerator)
 {
 	if (_state != WAITING_BLOCKS_GENERATION) throw std::runtime_error("A chunk is in an invalid state.");
 	
-	_blocks = worldGenerator.generateMountains(_position.x, _position.y, _position.z);
+	_blockContainer = worldGenerator.generateMountains(_position.x, _position.y, _position.z);
 	
 	_state = WAITING_MESH_GENERATION;
 }
@@ -36,12 +36,12 @@ void Chunk::generateMesh()
 		{
 			for (int x = 0; x < 16; x++)
 			{
-				BlockType block = getBlock(x, y, z);
+				BlockType block = _blockContainer.getBlock(x, y, z);
 				
 				if (block == AIR) continue;
 				
 				// x + 1
-				if ((x + 1 < 16 && getBlock(x+1, y, z) == AIR) || x + 1 == 16)
+				if ((x + 1 < 16 && _blockContainer.getBlock(x+1, y, z) == AIR) || x + 1 == 16)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
@@ -77,7 +77,7 @@ void Chunk::generateMesh()
 				}
 				
 				// x - 1
-				if ((x - 1 > -1 && getBlock(x-1, y, z) == AIR) || x - 1 == -1)
+				if ((x - 1 > -1 && _blockContainer.getBlock(x-1, y, z) == AIR) || x - 1 == -1)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
@@ -113,7 +113,7 @@ void Chunk::generateMesh()
 				}
 				
 				// y + 1
-				if ((y + 1 < 16 && getBlock(x, y+1, z) == AIR) || y + 1 == 16)
+				if ((y + 1 < 16 && _blockContainer.getBlock(x, y+1, z) == AIR) || y + 1 == 16)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
@@ -149,7 +149,7 @@ void Chunk::generateMesh()
 				}
 				
 				// y - 1
-				if ((y - 1 > -1 && getBlock(x, y-1, z) == AIR) || y - 1 == -1)
+				if ((y - 1 > -1 && _blockContainer.getBlock(x, y-1, z) == AIR) || y - 1 == -1)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
@@ -185,7 +185,7 @@ void Chunk::generateMesh()
 				}
 				
 				// z + 1
-				if ((z + 1 < 16 && getBlock(x, y, z+1) == AIR) || z + 1 == 16)
+				if ((z + 1 < 16 && _blockContainer.getBlock(x, y, z+1) == AIR) || z + 1 == 16)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
@@ -221,7 +221,7 @@ void Chunk::generateMesh()
 				}
 				
 				// z - 1
-				if ((z - 1 > -1 && getBlock(x, y, z-1) == AIR) || z - 1 == -1)
+				if ((z - 1 > -1 && _blockContainer.getBlock(x, y, z-1) == AIR) || z - 1 == -1)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
@@ -287,16 +287,6 @@ void Chunk::transferGeneratedMesh()
 	_state = READY;
 }
 
-BlockType Chunk::getBlock(int x, int y, int z) const
-{
-	return _blocks[x + y * 16 + z * 256];
-}
-
-void Chunk::setBlock(int x, int y, int z, BlockType block)
-{
-	_blocks[x + y * 16 + z * 256] = block;
-}
-
 ChunkState Chunk::getState() const
 {
 	return _state;
@@ -340,4 +330,9 @@ void Chunk::confirmDeletionFlag()
 bool Chunk::isSafelyDestroyable() const
 {
 	return _safelyDestroyableFlag;
+}
+
+BlockContainer& Chunk::getBlockContainer()
+{
+	return _blockContainer;
 }

@@ -4,11 +4,12 @@
 #include <vector>
 #include "BlockType.h"
 #include "NoiseGenerator.h"
+#include "BlockContainer.h"
 
 class MountainGenerator
 {
 public:
-	std::vector<BlockType> generate(int x, int y, int z);
+	BlockContainer generate(int x, int y, int z);
 
 private:
 	NoiseGenerator _noise;

@@ -1,9 +1,8 @@
 #include "MountainGenerator.h"
 
-std::vector<BlockType> MountainGenerator::generate(int x, int y, int z)
+BlockContainer MountainGenerator::generate(int x, int y, int z)
 {
-	std::vector<BlockType> blocks;
-	blocks.resize(16*16*16);
+	BlockContainer blockContainer;
 	
 	for (int heightY = 0; heightY < 16; heightY++)
 	{
@@ -19,23 +18,23 @@ std::vector<BlockType> MountainGenerator::generate(int x, int y, int z)
 				
 				if (worldHeight < surfaceHeight - 4)
 				{
-					blocks[heightX + height*16 + heightY*256] = STONE;
+					blockContainer.setBlock(heightX, height, heightY, STONE);
 				}
 				else if (worldHeight < surfaceHeight - 1)
 				{
-					blocks[heightX + height*16 + heightY*256] = DIRT;
+					blockContainer.setBlock(heightX, height, heightY, DIRT);
 				}
 				else if (worldHeight < surfaceHeight)
 				{
-					blocks[heightX + height*16 + heightY*256] = GRASS;
+					blockContainer.setBlock(heightX, height, heightY, GRASS);
 				}
 				else
 				{
-					blocks[heightX + height*16 + heightY*256] = AIR;
+					blockContainer.setBlock(heightX, height, heightY, AIR);
 				}
 			}
 		}
 	}
 	
-	return blocks;
+	return blockContainer;
 }

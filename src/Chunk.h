@@ -6,6 +6,7 @@
 #include <atomic>
 #include "BlockType.h"
 #include "WorldGenerator.h"
+#include "BlockContainer.h"
 
 /* faces:
 0: positive x
@@ -44,8 +45,7 @@ public:
 	
 	glm::ivec3 getPosition() const;
 	
-	BlockType getBlock(int x, int y, int z) const;
-	void setBlock(int x, int y, int z, BlockType block);
+	BlockContainer& getBlockContainer();
 	
 	ChunkState getState() const;
 	GLuint64 getVboAddress() const;
@@ -62,7 +62,7 @@ private:
 	glm::ivec3 _position;
 	glm::mat4 _model;
 	
-	std::vector<BlockType> _blocks;
+	BlockContainer _blockContainer;
 	std::vector<VertexData> _temporaryRamBuffer;
 	size_t _verticeCount = 0;
 	
