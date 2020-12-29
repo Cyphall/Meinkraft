@@ -109,5 +109,9 @@ int main(int argc, char** argv)
 		}
 	}
 	
+	Toolbox::renderer.reset();
+	Toolbox::world.reset();
+	Toolbox::camera.reset();
+	
 	glfwTerminate();
 }
