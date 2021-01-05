@@ -14,5 +14,10 @@ This is a full C++ rewrite of my original C# Meinkraft project.
 * Shift : Faster movements
 * Ctrl : Slower movements
 
+## Build
+1. Run init.bat
+2. Open CMakeLists.txt in your favorite C++ IDE
+3. Build
+
 ## License
 This work by [Cyphall](https://github.com/Cyphall) is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0).
