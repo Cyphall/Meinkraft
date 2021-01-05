@@ -7,9 +7,12 @@
 #include "Renderer.h"
 #include "Toolbox.h"
 #include <fmt/format.h>
+#include <sstream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#define VERSION(major, minor, revision) (major * 100 + minor * 10 + revision)
 
 void messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
 {
@@ -32,11 +35,82 @@ void messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLs
 	}
 }
 
+bool checkDriverSupport()
+{
+	glfwWindowHint(GLFW_VISIBLE, false);
+	
+	GLFWwindow* window = glfwCreateWindow(1, 1, "CompatibilityQuery", nullptr, nullptr);
+	glfwMakeContextCurrent(window);
+	
+	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+	
+	int major = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MAJOR);
+	int minor = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MINOR);
+	int revision = glfwGetWindowAttrib(window, GLFW_CONTEXT_REVISION);
+	int maxSupportedOpenGLVersion = VERSION(major, minor, revision);
+	int requestedOpenGLVersion = VERSION(4, 6, 0);
+	
+	std::stringstream errorMessage;
+	bool error = false;
+	if (maxSupportedOpenGLVersion < requestedOpenGLVersion)
+	{
+		errorMessage << "Required OpenGL " << requestedOpenGLVersion << " is not supported by this driver.\n";
+		errorMessage << "Please make sure your GPU is compatible and your driver is up to date.\n\n";
+		errorMessage << "Driver: " << glGetString(GL_VERSION) << "\n";
+		errorMessage << "GPU: " << glGetString(GL_RENDERER) << "\n";
+		error = true;
+	}
+	
+	std::string requiredExtensions[] = {
+			"GL_ARB_bindless_texture",
+			"GL_NV_bindless_multi_draw_indirect",
+			"GL_NV_shader_buffer_load",
+			"GL_NV_vertex_buffer_unified_memory"
+	};
+	
+	for (const std::string& extension : requiredExtensions)
+	{
+		if (error)
+			break;
+		
+		if (!glfwExtensionSupported(extension.c_str()))
+		{
+			errorMessage << "OpenGL extension " << extension << " is not supported by this driver.\n";
+			errorMessage << "Please make sure your GPU is compatible and your driver is up to date.\n\n";
+			errorMessage << "Driver: " << glGetString(GL_VERSION) << "\n";
+			errorMessage << "GPU: " << glGetString(GL_RENDERER) << "\n";
+			error = true;
+		}
+	}
+	
+	glfwMakeContextCurrent(nullptr);
+	glfwDestroyWindow(window);
+	
+	glfwWindowHint(GLFW_VISIBLE, true);
+	
+	if (error)
+	{
+		std::cout << errorMessage.str() << std::endl;
+	}
+	
+	return !error;
+}
+
 int main(int argc, char** argv)
 {
 	stbi_set_flip_vertically_on_load(true);
 	
 	glfwInit();
+	
+	glfwSetErrorCallback([](int code, const char* message) {
+		std::cout << "GLFW Error" << code << ": " << message << std::endl;
+	});
+	
+	if (!checkDriverSupport())
+	{
+		system("pause");
+		return 1;
+	}
 	
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -44,10 +118,6 @@ int main(int argc, char** argv)
 #if _DEBUG
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
-	
-	glfwSetErrorCallback([](int code, const char* message) {
-		std::cout << "GLFW Error" << code << ": " << message << std::endl;
-	});
 
 	if (argc == 2 && strcmp(argv[1], "--windowed") == 0 || IsDebuggerPresent())
 	{
@@ -63,8 +133,6 @@ int main(int argc, char** argv)
 	glfwMakeContextCurrent(Toolbox::window);
 	glfwSetInputMode(Toolbox::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(Toolbox::window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-	
-	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 	
 	glEnable(GL_DEBUG_OUTPUT);
 #if _DEBUG
