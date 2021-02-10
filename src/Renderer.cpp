@@ -34,6 +34,8 @@ _forwardShader({
 	glVertexArrayVertexBuffer(_vao, 0, 0, 0, sizeof(VertexData));
 	
 	glCreateBuffers(1, &_globalUniformBuffer);
+	glNamedBufferStorage(_globalUniformBuffer, sizeof(GlobalUniform),  nullptr, GL_DYNAMIC_STORAGE_BIT);
+	
 	glCreateBuffers(1, &_chunkUniformsBuffer);
 	
 	glCreateBuffers(1, &_texturesBuffer);
@@ -117,7 +119,7 @@ void Renderer::renderImpl()
 		commands.push_back(cmdNV);
 	}
 	
-	glNamedBufferData(_globalUniformBuffer, sizeof(GlobalUniform), &globalUniform, GL_DYNAMIC_DRAW);
+	glNamedBufferSubData(_globalUniformBuffer, 0, sizeof(GlobalUniform), &globalUniform);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, _globalUniformBuffer);
 	glNamedBufferData(_chunkUniformsBuffer, sizeof(ChunkUniform) * chunkUniforms.size(), chunkUniforms.data(), GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _chunkUniformsBuffer);
