@@ -195,10 +195,5 @@ void Camera::recalculateFrustumPlanes()
 	_frustumPlanes[2] = {.position = pos, .normal = glm::cross(X, glm::normalize((nearCenter - Y * nearHalfSize.y) - pos))}; // Bottom plane
 	_frustumPlanes[3] = {.position = pos, .normal = glm::cross(glm::normalize((nearCenter + Y * nearHalfSize.y) - pos), X)}; // Top plane
 	
-	for (FrustumPlane& plane : _frustumPlanes)
-	{
-		plane.position -= plane.normal * CHUNK_FRUSTUM_TEST_OFFSET;
-	}
-	
 	_frustumChanged = false;
 }

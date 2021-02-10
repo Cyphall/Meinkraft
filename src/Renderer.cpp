@@ -143,7 +143,7 @@ bool Renderer::isInFrustum(glm::dvec3 chunkCenterPos, const glm::mat4& vp, const
 {
 	for (const FrustumPlane& plane : frustumPlanes)
 	{
-		if (glm::dot(chunkCenterPos - plane.position, plane.normal) < 0)
+		if (glm::dot(chunkCenterPos - (plane.position - plane.normal * CHUNK_FRUSTUM_TEST_OFFSET), plane.normal) < 0)
 		{
 			return false;
 		}
