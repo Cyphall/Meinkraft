@@ -8,9 +8,10 @@ class ChunkBuffer;
 class ChunkBufferSegment
 {
 public:
-	// 16*16*8*6: checkerboard block configuration with the mose visible faces possible
-	// 4: n° of vertices in a block face
-	static inline constexpr int CHUNK_BUFFER_ELEMENT_COUNT = 16*16*8*6*4;
+	// 16*16*8: checkerboard block configuration with the mose visible faces possible
+	// 6: number of drawn faces in this configuration
+	// 6: n° of vertices in a block face
+	static inline constexpr int CHUNK_BUFFER_ELEMENT_COUNT = 16*16*8*6*6;
 	static inline constexpr int CHUNK_BUFFER_SIZE = CHUNK_BUFFER_ELEMENT_COUNT*sizeof(VertexData);
 	
 	ChunkBufferSegment(ChunkBufferSegment&& other) = delete;
