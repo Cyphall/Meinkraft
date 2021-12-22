@@ -1,5 +1,7 @@
 #version 460 core
 
+#define PI 3.14159265359f
+
 layout(location = 0) out vec3 o_color;
 
 in V2F
@@ -10,10 +12,21 @@ in V2F
 vec3 background(vec3 dir);
 vec3 srgbToLinear(vec3 srgb);
 vec3 linearToSRGB(vec3 linear);
+float degToRad(float deg);
+float radToDeg(float rad);
 
 void main()
 {
-	o_color = background(normalize(v2f.fragDir));
+	vec3 fragDir = normalize(v2f.fragDir);
+	
+	if (radToDeg(acos(dot(fragDir, normalize(vec3(1, 1, 1))))) < 3.0f)
+	{
+		o_color = vec3(1, 1, 1);
+	}
+	else
+	{
+		o_color = background(fragDir);
+	}
 }
 
 vec3 background(vec3 dir)
@@ -41,4 +54,14 @@ vec3 linearToSRGB(vec3 linear)
 	vec3 lower = linear * vec3(12.92);
 	
 	return mix(higher, lower, cutoff);
+}
+
+float degToRad(float deg)
+{
+	return deg * PI / 180.0f;
+}
+
+float radToDeg(float rad)
+{
+	return rad * 180.0f / PI;
 }
