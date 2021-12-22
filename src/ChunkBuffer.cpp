@@ -24,8 +24,6 @@ bool ChunkBuffer::tryAcquireAvailableSegment(std::unique_ptr<ChunkBufferSegment>
 
 void ChunkBuffer::releaseMemory(int index)
 {
-	int bufferSize = -1;
-	glGetNamedBufferParameteriv(_vbo, GL_BUFFER_SIZE, &bufferSize);
 	glInvalidateBufferSubData(_vbo, index * ChunkBufferSegment::CHUNK_BUFFER_SIZE, ChunkBufferSegment::CHUNK_BUFFER_SIZE);
 	_bufferSegments[index] = nullptr;
 }
