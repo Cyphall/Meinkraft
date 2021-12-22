@@ -18,7 +18,11 @@ public:
 
 private:
 	ShaderProgram _forwardShader;
-	GLuint _vao;
+	GLuint _blocksVao;
+	
+	ShaderProgram _skyboxShader;
+	GLuint _skyboxVao;
+	GLuint _skyboxVbo;
 	
 	GLuint _globalUniformBuffer;
 	GLuint _chunkUniformsBuffer;
@@ -29,9 +33,8 @@ private:
 	
 	ChunkBufferManager _chunkBufferManager;
 	
-	void prepare();
-	void renderImpl();
-	void restore();
+	void renderChunks();
+	void renderSkybox();
 	
 	bool isInFrustum(glm::dvec3 chunkCenterPos, const glm::mat4& vp, const std::array<FrustumPlane, 4>& frustumPlanes);
 	
