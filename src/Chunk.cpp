@@ -1,20 +1,14 @@
 #include "Chunk.h"
+#include "Toolbox.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <stdexcept>
+#include "Renderer.h"
+#include "ChunkBufferManager.h"
 
 Chunk::Chunk(glm::ivec3 position):
 _position(position)
 {
 	_model = glm::translate(glm::mat4(1), static_cast<glm::vec3>(_position) * 16.0f);
-}
-
-Chunk::~Chunk()
-{
-	if (_vbo)
-	{
-		glMakeNamedBufferNonResidentNV(_vbo);
-		glDeleteBuffers(1, &_vbo);
-	}
 }
 
 void Chunk::initializeBlocks(WorldGenerator& worldGenerator)
@@ -258,6 +252,7 @@ void Chunk::generateMesh()
 			}
 		}
 	}
+	_verticeCount = _temporaryRamBuffer.size();
 	_state = WAITING_MESH_TRANSFER;
 }
 
@@ -265,24 +260,16 @@ void Chunk::transferGeneratedMesh()
 {
 	if (_state != WAITING_MESH_TRANSFER) throw std::runtime_error("A chunk is in an invalid state.");
 	
-	if (_vbo)
+	if (_verticeCount > 0)
 	{
-		glMakeNamedBufferNonResidentNV(_vbo);
-		glDeleteBuffers(1, &_vbo);
-		_vbo = 0;
-		_vboAddress = 0;
+		if (!_bufferSegment)
+		{
+			Toolbox::renderer->getChunkBufferManager().acquireAvailableSegment(_bufferSegment);
+		}
+		
+		_bufferSegment->setData(_temporaryRamBuffer);
+		_temporaryRamBuffer = std::vector<VertexData>();
 	}
-	
-	if (_temporaryRamBuffer.size() > 0)
-	{
-		glCreateBuffers(1, &_vbo);
-		glNamedBufferStorage(_vbo, _temporaryRamBuffer.size() * sizeof(VertexData), _temporaryRamBuffer.data(), 0);
-		glGetNamedBufferParameterui64vNV(_vbo, GL_BUFFER_GPU_ADDRESS_NV, &_vboAddress);
-		glMakeNamedBufferResidentNV(_vbo, GL_READ_ONLY);
-	}
-	
-	_verticeCount = _temporaryRamBuffer.size();
-	_temporaryRamBuffer = std::vector<VertexData>();
 	
 	_state = READY;
 }
@@ -295,16 +282,6 @@ ChunkState Chunk::getState() const
 glm::ivec3 Chunk::getPosition() const
 {
 	return _position;
-}
-
-GLuint64 Chunk::getVboAddress() const
-{
-	return _vboAddress;
-}
-
-size_t Chunk::getVerticeCount() const
-{
-	return _verticeCount;
 }
 
 glm::mat4 Chunk::getModel() const
@@ -335,4 +312,19 @@ bool Chunk::isSafelyDestroyable() const
 BlockContainer& Chunk::getBlockContainer()
 {
 	return _blockContainer;
+}
+
+const ChunkBufferSegment* Chunk::getBufferSegment() const
+{
+	return _bufferSegment.get();
+}
+
+bool Chunk::shouldBeDrawn() const
+{
+	return static_cast<bool>(_bufferSegment);
+}
+
+size_t Chunk::getVerticeCount() const
+{
+	return _verticeCount;
 }

@@ -2,27 +2,14 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <atomic>
+#include <memory>
 #include "BlockType.h"
 #include "WorldGenerator.h"
 #include "BlockContainer.h"
-
-/* faces:
-0: positive x
-1: negative x
-2: positive y
-3: negative y
-4: positive z
-5: negative z
- */
-struct VertexData
-{
-	glm::u8vec3 position; // xxxxxxxx, yyyyyyyy, zzzzzzzz
-	glm::u8vec2 uv;       // uuuuuuuu, vvvvvvvv
-	uint8_t face;         // ffffffff
-	uint8_t block;        // bbbbbbbb
-};
+#include "GL/VertexData.h"
+#include "ChunkBufferSegment.h"
 
 enum ChunkState
 {
@@ -36,7 +23,6 @@ class Chunk
 {
 public:
 	Chunk(glm::ivec3 position);
-	~Chunk();
 	
 	void initializeBlocks(WorldGenerator& worldGenerator);
 	void generateMesh();
@@ -48,28 +34,30 @@ public:
 	BlockContainer& getBlockContainer();
 	
 	ChunkState getState() const;
-	GLuint64 getVboAddress() const;
-	size_t getVerticeCount() const;
 	glm::mat4 getModel() const;
+	size_t getVerticeCount() const;
 	
 	void flagForDeletion();
 	bool isFlaggedForDeletion() const;
 	
 	void confirmDeletionFlag();
 	bool isSafelyDestroyable() const;
+	
+	bool shouldBeDrawn() const;
+	
+	const ChunkBufferSegment* getBufferSegment() const;
  
 private:
 	glm::ivec3 _position;
 	glm::mat4 _model;
 	
 	BlockContainer _blockContainer;
+	
 	std::vector<VertexData> _temporaryRamBuffer;
-	size_t _verticeCount = 0;
+	std::unique_ptr<ChunkBufferSegment> _bufferSegment;
+	size_t _verticeCount = -1;
 	
 	std::atomic<ChunkState> _state = WAITING_BLOCKS_GENERATION;
 	std::atomic<bool> _deletionFlag;
-	std::atomic<bool> _safelyDestroyableFlag; // this flags certify this chunk is not in some queue waiting to be processed
-	
-	GLuint _vbo = 0;
-	GLuint64 _vboAddress = 0;
+	std::atomic<bool> _safelyDestroyableFlag; // this flags certifies this chunk is not in some queue waiting to be processed
 };

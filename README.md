@@ -1,13 +1,6 @@
 # Meinkraft
-Meinkraft is a Minecraft-like project made to experiment with the Nvidia extensions that Vulkanize OpenGL.<br/>
-This project therefore requires an Nvidia GPU to run.<br/>
+Meinkraft is a Minecraft-like project made to experiment with the ~~Nvidia extensions that Vulkanize OpenGL~~ modern GL commands made to accelerate drawcalls.<br/>
 This is a full C++ rewrite of my original C# Meinkraft project.
-
-### Extensions used in this project
-* GL_ARB_bindless_texture
-* GL_NV_bindless_multi_draw_indirect
-* GL_NV_shader_buffer_load
-* GL_NV_vertex_buffer_unified_memory
 
 ## Controls
 * ZQSD : Movements

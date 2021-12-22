@@ -1,16 +1,18 @@
 #include <iostream>
 #include <windows.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include "Camera.h"
 #include "World.h"
 #include "Renderer.h"
 #include "Toolbox.h"
 #include <fmt/format.h>
-#include <sstream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#define GLAD_GL_IMPLEMENTATION
+#include <glad/gl.h>
+
+#include <GLFW/glfw3.h>
 
 #define VERSION(major, minor, revision) (major * 100 + minor * 10 + revision)
 
@@ -42,7 +44,7 @@ bool checkDriverSupport()
 	GLFWwindow* window = glfwCreateWindow(1, 1, "CompatibilityQuery", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 	
-	gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+	gladLoadGL(glfwGetProcAddress);
 	
 	int major = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MAJOR);
 	int minor = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MINOR);
@@ -141,9 +143,9 @@ int main(int argc, char** argv)
 #endif
 	glDebugMessageCallback(messageCallback, nullptr);
 	
-	Toolbox::camera = std::make_unique<Camera>(glm::dvec3(8, 180, 8));
-	Toolbox::world = std::make_unique<World>();
+	Toolbox::camera = std::make_unique<Camera>(glm::dvec3(8, 170, 8));
 	Toolbox::renderer = std::make_unique<Renderer>();
+	Toolbox::world = std::make_unique<World>();
 	
 	double previousTime = 0;
 	double previousPrint = 0;
@@ -177,8 +179,8 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	Toolbox::renderer.reset();
 	Toolbox::world.reset();
+	Toolbox::renderer.reset();
 	Toolbox::camera.reset();
 	
 	glfwTerminate();

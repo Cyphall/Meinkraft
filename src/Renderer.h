@@ -4,6 +4,7 @@
 #include "GL/Texture.h"
 #include "Camera.h"
 #include "BlockTextures.h"
+#include "ChunkBufferManager.h"
 #include <memory>
 
 class Renderer
@@ -12,6 +13,8 @@ public:
 	Renderer();
 	
 	void render();
+	
+	ChunkBufferManager& getChunkBufferManager();
 
 private:
 	ShaderProgram _forwardShader;
@@ -23,6 +26,8 @@ private:
 	GLuint _texturesBuffer;
 	
 	std::vector<BlockTextures> _textures;
+	
+	ChunkBufferManager _chunkBufferManager;
 	
 	void prepare();
 	void renderImpl();

@@ -62,7 +62,8 @@ void main()
 
     frag.TexCoords = vec2(in_uv);
 
-    frag.FragPos = vec3(chunkUniforms[gl_DrawID].model * vec4(position, 1.0));
+	vec4 worldPosition = chunkUniforms[gl_DrawID].model * vec4(position, 1.0);
+    frag.FragPos = vec3(worldPosition);
 
     Block = in_block;
     Face = in_face;
@@ -74,5 +75,5 @@ void main()
     frag.TangentToWorld = mat3(T, B, N);
     frag.WorldToTangent = transpose(frag.TangentToWorld);
 
-    gl_Position = globalUniform.viewProjection * chunkUniforms[gl_DrawID].model * vec4(position, 1.0);
+    gl_Position = globalUniform.viewProjection * worldPosition;
 }

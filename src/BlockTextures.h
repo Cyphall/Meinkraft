@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GL/Texture.h"
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 class BlockTextures
 {
