@@ -97,7 +97,7 @@ void World::update()
 		chunk->transferGeneratedMesh();
 		transferredChunks++;
 		
-		if (transferredChunks >= 10) break; // Prevent more than 10 chunks to be transferred every frame
+		if (transferredChunks >= 50) break; // Prevent more than 10 chunks to be transferred every frame
 	}
 }
 
@@ -108,7 +108,7 @@ const std::unordered_map<glm::ivec3, Chunk>& World::getChunks()
 
 void World::handleNewChunkPos(glm::ivec3 playerChunkPos)
 {
-	float renderDistance = 8;
+	float renderDistance = 16;
 	
 	for (auto i = _chunks.begin(); i != _chunks.end();)
 	{

@@ -104,7 +104,6 @@ _skyboxShader({
 	// ========== CHUNK UNIFORMS SSBO ==========
 	
 	glCreateBuffers(1, &_chunkUniformsBuffer);
-	glNamedBufferStorage(_chunkUniformsBuffer, ChunkBuffer::CHUNK_COUNT * sizeof(ChunkUniform), nullptr, GL_DYNAMIC_STORAGE_BIT);
 	
 	// ========== TEXTURE SSBO ==========
 	
@@ -167,6 +166,11 @@ void Renderer::renderChunks()
 	const std::array<FrustumPlane, 4>& frustumPlanes = Toolbox::camera->getFrustumPlanes();
 	
 	std::map<const ChunkBuffer*, std::vector<const Chunk*>> chunksToDraw;
+	for (auto& buffer : _chunkBufferManager.getBuffers())
+	{
+		chunksToDraw[buffer.get()].reserve(buffer->getActiveSegmentCount());
+	}
+	
 	for (auto& it : Toolbox::world->getChunks())
 	{
 		const Chunk& chunk = it.second;
@@ -187,33 +191,34 @@ void Renderer::renderChunks()
 	_forwardShader.bind();
 	
 	std::vector<ChunkUniform> chunkUniforms;
-	chunkUniforms.reserve(ChunkBuffer::CHUNK_COUNT);
-	std::vector<GLint> chunkOffsets;
-	chunkOffsets.reserve(ChunkBuffer::CHUNK_COUNT);
+	std::vector<GLint> chunkStartIndices;
 	std::vector<GLsizei> chunkVerticeCounts;
-	chunkVerticeCounts.reserve(ChunkBuffer::CHUNK_COUNT);
 	for (auto& [chunkBuffer, chunks] : chunksToDraw)
 	{
 		chunkUniforms.clear();
-		chunkOffsets.clear();
+		chunkUniforms.reserve(chunks.size());
+		chunkStartIndices.clear();
+		chunkStartIndices.reserve(chunks.size());
 		chunkVerticeCounts.clear();
+		chunkVerticeCounts.reserve(chunks.size());
+		
 		for (int i = 0; i < chunks.size(); i++)
 		{
 			ChunkUniform& uniform = chunkUniforms.emplace_back();
 			uniform.model = chunks[i]->getModel();
 			uniform.normalMatrix = glm::inverseTranspose(glm::mat3(uniform.model));
 			
-			chunkOffsets.push_back(chunks[i]->getBufferSegment()->getIndexOffset());
-			
-			chunkVerticeCounts.push_back(chunks[i]->getVerticeCount());
+			const ChunkBufferSegment* segment = chunks[i]->getBufferSegment();
+			chunkStartIndices.push_back(segment->getStartIndex());
+			chunkVerticeCounts.push_back(segment->getVertexCount());
 		}
 		
-		glNamedBufferSubData(_chunkUniformsBuffer, 0, sizeof(ChunkUniform) * chunkUniforms.size(), chunkUniforms.data());
+		glNamedBufferData(_chunkUniformsBuffer, chunkUniforms.size() * sizeof(ChunkUniform), chunkUniforms.data(), GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _chunkUniformsBuffer);
 		
 		glVertexArrayVertexBuffer(_blocksVao, 0, chunkBuffer->getGLBuffer(), 0, sizeof(VertexData));
 		
-		glMultiDrawArrays(GL_TRIANGLES, chunkOffsets.data(), chunkVerticeCounts.data(), chunks.size());
+		glMultiDrawArrays(GL_TRIANGLES, chunkStartIndices.data(), chunkVerticeCounts.data(), chunks.size());
 	}
 	
 	glDisable(GL_DEPTH_TEST);

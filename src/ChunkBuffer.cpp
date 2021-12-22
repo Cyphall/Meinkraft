@@ -4,33 +4,40 @@ ChunkBuffer::ChunkBuffer()
 {
 	glCreateBuffers(1, &_vbo);
 	
-	glNamedBufferStorage(_vbo, ChunkBuffer::CHUNK_COUNT * ChunkBufferSegment::CHUNK_BUFFER_SIZE, nullptr, GL_DYNAMIC_STORAGE_BIT);
+	glNamedBufferStorage(_vbo, ChunkBuffer::BUFFER_ELEMENT_COUNT * sizeof(VertexData), nullptr, GL_DYNAMIC_STORAGE_BIT);
 }
 
-bool ChunkBuffer::tryAcquireAvailableSegment(std::unique_ptr<ChunkBufferSegment>& segment)
+bool ChunkBuffer::tryAcquireAvailableSegment(std::unique_ptr<ChunkBufferSegment>& newSegment, int requestedVertexCount)
 {
-	for (int i = 0; i < _bufferSegments.size(); i++)
+	int startIndex = 0;
+	for (const ChunkBufferSegment* segment : _bufferSegments)
 	{
-		if (!_bufferSegments[i])
+		if (segment->getStartIndex() - startIndex >= requestedVertexCount)
 		{
-			segment.reset(new ChunkBufferSegment(*this, i));
-			_bufferSegments[i] = segment.get();
-			return true;
+			break;
 		}
+		startIndex = segment->getStartIndex() + segment->getVertexCount();
+	}
+	
+	if (startIndex + requestedVertexCount < ChunkBuffer::BUFFER_ELEMENT_COUNT)
+	{
+		newSegment.reset(new ChunkBufferSegment(*this, startIndex, requestedVertexCount));
+		_bufferSegments.insert(newSegment.get());
+		return true;
 	}
 	
 	return false;
 }
 
-void ChunkBuffer::releaseMemory(int index)
+void ChunkBuffer::releaseMemory(ChunkBufferSegment* segment)
 {
-	glInvalidateBufferSubData(_vbo, index * ChunkBufferSegment::CHUNK_BUFFER_SIZE, ChunkBufferSegment::CHUNK_BUFFER_SIZE);
-	_bufferSegments[index] = nullptr;
+	glInvalidateBufferSubData(_vbo, segment->getStartIndex() * sizeof(VertexData), segment->getVertexCount() * sizeof(VertexData));
+	_bufferSegments.erase(segment);
 }
 
-void ChunkBuffer::setData(int index, const std::vector<VertexData>& data)
+void ChunkBuffer::setData(ChunkBufferSegment* segment, const std::vector<VertexData>& data)
 {
-	glNamedBufferSubData(_vbo, index * ChunkBufferSegment::CHUNK_BUFFER_SIZE, data.size() * sizeof(VertexData), data.data());
+	glNamedBufferSubData(_vbo, segment->getStartIndex() * sizeof(VertexData), data.size() * sizeof(VertexData), data.data());
 }
 
 ChunkBuffer::~ChunkBuffer()
@@ -41,4 +48,9 @@ ChunkBuffer::~ChunkBuffer()
 GLuint ChunkBuffer::getGLBuffer() const
 {
 	return _vbo;
+}
+
+int ChunkBuffer::getActiveSegmentCount() const
+{
+	return _bufferSegments.size();
 }

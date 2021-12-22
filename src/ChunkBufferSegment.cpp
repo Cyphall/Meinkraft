@@ -1,21 +1,21 @@
 #include "ChunkBufferSegment.h"
 #include "ChunkBuffer.h"
 
-ChunkBufferSegment::ChunkBufferSegment(ChunkBuffer& container, int segmentIndex):
-_container(container), _segmentIndex(segmentIndex)
+ChunkBufferSegment::ChunkBufferSegment(ChunkBuffer& container, int startIndex, int vertexCount):
+_container(container), _startIndex(startIndex), _vertexCount(vertexCount)
 {
 
 }
 
 ChunkBufferSegment::~ChunkBufferSegment()
 {
-	_container.releaseMemory(_segmentIndex);
+	_container.releaseMemory(this);
 }
 
 void ChunkBufferSegment::setData(const std::vector<VertexData>& data)
 {
-	assert(data.size() <= ChunkBufferSegment::CHUNK_BUFFER_SIZE);
-	_container.setData(_segmentIndex, data);
+	assert(data.size() == _vertexCount);
+	_container.setData(this, data);
 }
 
 const ChunkBuffer& ChunkBufferSegment::getBuffer() const
@@ -23,12 +23,12 @@ const ChunkBuffer& ChunkBufferSegment::getBuffer() const
 	return _container;
 }
 
-int ChunkBufferSegment::getByteOffset() const
+int ChunkBufferSegment::getStartIndex() const
 {
-	return _segmentIndex * ChunkBufferSegment::CHUNK_BUFFER_SIZE;
+	return _startIndex;
 }
 
-int ChunkBufferSegment::getIndexOffset() const
+int ChunkBufferSegment::getVertexCount() const
 {
-	return _segmentIndex * ChunkBufferSegment::CHUNK_BUFFER_ELEMENT_COUNT;
+	return _vertexCount;
 }

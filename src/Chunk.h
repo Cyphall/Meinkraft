@@ -35,7 +35,6 @@ public:
 	
 	ChunkState getState() const;
 	glm::mat4 getModel() const;
-	size_t getVerticeCount() const;
 	
 	void flagForDeletion();
 	bool isFlaggedForDeletion() const;
@@ -55,7 +54,6 @@ private:
 	
 	std::vector<VertexData> _temporaryRamBuffer;
 	std::unique_ptr<ChunkBufferSegment> _bufferSegment;
-	size_t _verticeCount = -1;
 	
 	std::atomic<ChunkState> _state = WAITING_BLOCKS_GENERATION;
 	std::atomic<bool> _deletionFlag;

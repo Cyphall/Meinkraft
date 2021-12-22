@@ -252,7 +252,6 @@ void Chunk::generateMesh()
 			}
 		}
 	}
-	_verticeCount = _temporaryRamBuffer.size();
 	_state = WAITING_MESH_TRANSFER;
 }
 
@@ -260,11 +259,11 @@ void Chunk::transferGeneratedMesh()
 {
 	if (_state != WAITING_MESH_TRANSFER) throw std::runtime_error("A chunk is in an invalid state.");
 	
-	if (_verticeCount > 0)
+	if (!_temporaryRamBuffer.empty())
 	{
 		if (!_bufferSegment)
 		{
-			Toolbox::renderer->getChunkBufferManager().acquireAvailableSegment(_bufferSegment);
+			Toolbox::renderer->getChunkBufferManager().acquireAvailableSegment(_bufferSegment, _temporaryRamBuffer.size());
 		}
 		
 		_bufferSegment->setData(_temporaryRamBuffer);
@@ -322,9 +321,4 @@ const ChunkBufferSegment* Chunk::getBufferSegment() const
 bool Chunk::shouldBeDrawn() const
 {
 	return static_cast<bool>(_bufferSegment);
-}
-
-size_t Chunk::getVerticeCount() const
-{
-	return _verticeCount;
 }
