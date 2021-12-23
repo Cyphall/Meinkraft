@@ -19,21 +19,17 @@ void main()
 {
 	vec3 fragDir = normalize(v2f.fragDir);
 	
-	if (radToDeg(acos(dot(fragDir, normalize(vec3(1, 1, 1))))) < 3.0f)
-	{
-		o_color = vec3(1, 1, 1);
-	}
-	else
-	{
-		o_color = background(fragDir);
-	}
+	vec3 sunDir = normalize(vec3(1, 1, 1));
+	float fragDirDotSun = max(dot(fragDir, sunDir), 0);
+	float sunIntensity = pow(fragDirDotSun, 32);
+	o_color = mix(background(fragDir), vec3(1), sunIntensity);
 }
 
 vec3 background(vec3 dir)
 {
 	const vec3 sky = vec3(0.21763764, 0.45626346, 1.0);
 	const vec3 ground = vec3(1.0, 1.0, 1.0);
-
+	
 	float t = dir.y * 0.5 + 0.5;
 	return mix(ground, sky, t);
 }
