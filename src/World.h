@@ -29,6 +29,8 @@ private:
 	std::thread _chunkInitThread;
 	std::thread _chunkMeshGenerationThread;
 	
+	std::atomic<bool> _threadsStopSignal = false;
+	
 	void handleNewChunkPos(glm::ivec3 playerChunkPos);
 	
 	glm::ivec3 getPlayerChunkPos();

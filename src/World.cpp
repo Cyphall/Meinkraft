@@ -5,7 +5,7 @@
 #include "Toolbox.h"
 #include "Helper/MathHelper.h"
 
-void chunkInitTask(tbb::concurrent_bounded_queue<Chunk*>& chunksInitQueue, tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGenerationQueue)
+void chunkInitTask(tbb::concurrent_bounded_queue<Chunk*>& chunksInitQueue, tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGenerationQueue, const std::atomic<bool>& threadsStopSignal)
 {
 	WorldGenerator worldGenerator;
 	Chunk* chunk;
@@ -14,7 +14,8 @@ void chunkInitTask(tbb::concurrent_bounded_queue<Chunk*>& chunksInitQueue, tbb::
 	{
 		chunksInitQueue.pop(chunk);
 		
-		if (chunk == nullptr) break;
+		if (threadsStopSignal)
+			break;
 		
 		if (chunk->isFlaggedForDeletion())
 		{
@@ -29,7 +30,7 @@ void chunkInitTask(tbb::concurrent_bounded_queue<Chunk*>& chunksInitQueue, tbb::
 	
 }
 
-void chunkMeshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGenerationQueue, tbb::concurrent_bounded_queue<Chunk*>& chunkMeshTransferQueue)
+void chunkMeshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGenerationQueue, tbb::concurrent_bounded_queue<Chunk*>& chunkMeshTransferQueue, const std::atomic<bool>& threadsStopSignal)
 {
 	Chunk* chunk;
 	
@@ -37,7 +38,8 @@ void chunkMeshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGen
 	{
 		chunkMeshGenerationQueue.pop(chunk);
 		
-		if (chunk == nullptr) break;
+		if (threadsStopSignal)
+			break;
 		
 		if (chunk->isFlaggedForDeletion())
 		{
@@ -52,8 +54,8 @@ void chunkMeshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGen
 }
 
 World::World():
-_chunkInitThread(chunkInitTask, std::ref(_chunksInitQueue), std::ref(_chunkMeshGenerationQueue)),
-_chunkMeshGenerationThread(chunkMeshGenerationTask, std::ref(_chunkMeshGenerationQueue), std::ref(_chunkMeshTransferQueue)),
+_chunkInitThread(chunkInitTask, std::ref(_chunksInitQueue), std::ref(_chunkMeshGenerationQueue), std::ref(_threadsStopSignal)),
+_chunkMeshGenerationThread(chunkMeshGenerationTask, std::ref(_chunkMeshGenerationQueue), std::ref(_chunkMeshTransferQueue), std::ref(_threadsStopSignal)),
 _lastFramePlayerChunkPos(getPlayerChunkPos())
 {
 	handleNewChunkPos(_lastFramePlayerChunkPos);
@@ -61,10 +63,8 @@ _lastFramePlayerChunkPos(getPlayerChunkPos())
 
 World::~World()
 {
-	for (auto& it : _chunks)
-	{
-		it.second.flagForDeletion();
-	}
+	_threadsStopSignal = true;
+	
 	_chunksInitQueue.push(nullptr);
 	_chunkMeshGenerationQueue.push(nullptr);
 	
