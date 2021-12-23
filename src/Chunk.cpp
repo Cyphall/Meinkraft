@@ -24,28 +24,29 @@ void Chunk::generateMesh()
 {
 	if (_state != WAITING_MESH_GENERATION) throw std::runtime_error("A chunk is in an invalid state.");
 	
-	for (int z = 0; z < 16; z++)
+	glm::u8vec3 pos;
+	for (pos.z = 0; pos.z < 16; pos.z++)
 	{
-		for (int y = 0; y < 16; y++)
+		for (pos.y = 0; pos.y < 16; pos.y++)
 		{
-			for (int x = 0; x < 16; x++)
+			for (pos.x = 0; pos.x < 16; pos.x++)
 			{
-				BlockType block = _blockContainer.getBlock(x, y, z);
+				BlockType block = _blockContainer.getBlock(pos);
 				
 				if (block == AIR) continue;
 				
 				// x + 1
-				if ((x + 1 < 16 && _blockContainer.getBlock(x+1, y, z) == AIR) || x + 1 == 16)
+				if ((pos.x + 1 < 16 && _blockContainer.getBlock(pos + glm::u8vec3(+1, 0, 0)) == AIR) || pos.x + 1 == 16)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
 					VertexData vertexBR;
 					VertexData vertexTR;
 					
-					vertexBL.position = glm::u8vec3(x+ 1, y+ 0, z+ 1);
-					vertexTL.position = glm::u8vec3(x+ 1, y+ 1, z+ 1);
-					vertexBR.position = glm::u8vec3(x+ 1, y+ 0, z+ 0);
-					vertexTR.position = glm::u8vec3(x+ 1, y+ 1, z+ 0);
+					vertexBL.position = pos + glm::u8vec3(1, 0, 1);
+					vertexTL.position = pos + glm::u8vec3(1, 1, 1);
+					vertexBR.position = pos + glm::u8vec3(1, 0, 0);
+					vertexTR.position = pos + glm::u8vec3(1, 1, 0);
 					
 					vertexBL.uv = glm::u8vec2(0, 0);
 					vertexTL.uv = glm::u8vec2(0, 1);
@@ -71,17 +72,17 @@ void Chunk::generateMesh()
 				}
 				
 				// x - 1
-				if ((x - 1 > -1 && _blockContainer.getBlock(x-1, y, z) == AIR) || x - 1 == -1)
+				if ((pos.x - 1 > -1 && _blockContainer.getBlock(pos + glm::u8vec3(-1, 0, 0)) == AIR) || pos.x - 1 == -1)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
 					VertexData vertexBR;
 					VertexData vertexTR;
 					
-					vertexBL.position = glm::u8vec3(x+ 0, y+ 0, z+ 0);
-					vertexTL.position = glm::u8vec3(x+ 0, y+ 1, z+ 0);
-					vertexBR.position = glm::u8vec3(x+ 0, y+ 0, z+ 1);
-					vertexTR.position = glm::u8vec3(x+ 0, y+ 1, z+ 1);
+					vertexBL.position = pos + glm::u8vec3(0, 0, 0);
+					vertexTL.position = pos + glm::u8vec3(0, 1, 0);
+					vertexBR.position = pos + glm::u8vec3(0, 0, 1);
+					vertexTR.position = pos + glm::u8vec3(0, 1, 1);
 					
 					vertexBL.uv = glm::u8vec2(0, 0);
 					vertexTL.uv = glm::u8vec2(0, 1);
@@ -107,17 +108,17 @@ void Chunk::generateMesh()
 				}
 				
 				// y + 1
-				if ((y + 1 < 16 && _blockContainer.getBlock(x, y+1, z) == AIR) || y + 1 == 16)
+				if ((pos.y + 1 < 16 && _blockContainer.getBlock(pos + glm::u8vec3(0, +1, 0)) == AIR) || pos.y + 1 == 16)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
 					VertexData vertexBR;
 					VertexData vertexTR;
 					
-					vertexBL.position = glm::u8vec3(x+ 0, y+ 1, z+ 0);
-					vertexTL.position = glm::u8vec3(x+ 1, y+ 1, z+ 0);
-					vertexBR.position = glm::u8vec3(x+ 0, y+ 1, z+ 1);
-					vertexTR.position = glm::u8vec3(x+ 1, y+ 1, z+ 1);
+					vertexBL.position = pos + glm::u8vec3(0, 1, 0);
+					vertexTL.position = pos + glm::u8vec3(1, 1, 0);
+					vertexBR.position = pos + glm::u8vec3(0, 1, 1);
+					vertexTR.position = pos + glm::u8vec3(1, 1, 1);
 					
 					vertexBL.uv = glm::u8vec2(0, 0);
 					vertexTL.uv = glm::u8vec2(0, 1);
@@ -143,17 +144,17 @@ void Chunk::generateMesh()
 				}
 				
 				// y - 1
-				if ((y - 1 > -1 && _blockContainer.getBlock(x, y-1, z) == AIR) || y - 1 == -1)
+				if ((pos.y - 1 > -1 && _blockContainer.getBlock(pos + glm::u8vec3(0, -1, 0)) == AIR) || pos.y - 1 == -1)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
 					VertexData vertexBR;
 					VertexData vertexTR;
 					
-					vertexBL.position = glm::u8vec3(x+ 1, y+ 0, z+ 0);
-					vertexTL.position = glm::u8vec3(x+ 0, y+ 0, z+ 0);
-					vertexBR.position = glm::u8vec3(x+ 1, y+ 0, z+ 1);
-					vertexTR.position = glm::u8vec3(x+ 0, y+ 0, z+ 1);
+					vertexBL.position = pos + glm::u8vec3(1, 0, 0);
+					vertexTL.position = pos + glm::u8vec3(0, 0, 0);
+					vertexBR.position = pos + glm::u8vec3(1, 0, 1);
+					vertexTR.position = pos + glm::u8vec3(0, 0, 1);
 					
 					vertexBL.uv = glm::u8vec2(0, 0);
 					vertexTL.uv = glm::u8vec2(0, 1);
@@ -179,17 +180,17 @@ void Chunk::generateMesh()
 				}
 				
 				// z + 1
-				if ((z + 1 < 16 && _blockContainer.getBlock(x, y, z+1) == AIR) || z + 1 == 16)
+				if ((pos.z + 1 < 16 && _blockContainer.getBlock(pos + glm::u8vec3(0, 0, +1)) == AIR) || pos.z + 1 == 16)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
 					VertexData vertexBR;
 					VertexData vertexTR;
 					
-					vertexBL.position = glm::u8vec3(x+ 0, y+ 0, z+ 1);
-					vertexTL.position = glm::u8vec3(x+ 0, y+ 1, z+ 1);
-					vertexBR.position = glm::u8vec3(x+ 1, y+ 0, z+ 1);
-					vertexTR.position = glm::u8vec3(x+ 1, y+ 1, z+ 1);
+					vertexBL.position = pos + glm::u8vec3(0, 0, 1);
+					vertexTL.position = pos + glm::u8vec3(0, 1, 1);
+					vertexBR.position = pos + glm::u8vec3(1, 0, 1);
+					vertexTR.position = pos + glm::u8vec3(1, 1, 1);
 					
 					vertexBL.uv = glm::u8vec2(0, 0);
 					vertexTL.uv = glm::u8vec2(0, 1);
@@ -215,17 +216,17 @@ void Chunk::generateMesh()
 				}
 				
 				// z - 1
-				if ((z - 1 > -1 && _blockContainer.getBlock(x, y, z-1) == AIR) || z - 1 == -1)
+				if ((pos.z - 1 > -1 && _blockContainer.getBlock(pos + glm::u8vec3(0, 0, -1)) == AIR) || pos.z - 1 == -1)
 				{
 					VertexData vertexBL;
 					VertexData vertexTL;
 					VertexData vertexBR;
 					VertexData vertexTR;
 					
-					vertexBL.position = glm::u8vec3(x+ 1, y+ 0, z+ 0);
-					vertexTL.position = glm::u8vec3(x+ 1, y+ 1, z+ 0);
-					vertexBR.position = glm::u8vec3(x+ 0, y+ 0, z+ 0);
-					vertexTR.position = glm::u8vec3(x+ 0, y+ 1, z+ 0);
+					vertexBL.position = pos + glm::u8vec3(1, 0, 0);
+					vertexTL.position = pos + glm::u8vec3(1, 1, 0);
+					vertexBR.position = pos + glm::u8vec3(0, 0, 0);
+					vertexTR.position = pos + glm::u8vec3(0, 1, 0);
 					
 					vertexBL.uv = glm::u8vec2(0, 0);
 					vertexTL.uv = glm::u8vec2(0, 1);

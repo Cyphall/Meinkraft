@@ -1,18 +1,29 @@
 #include <cassert>
 #include "BlockContainer.h"
+#include "Helper/MathHelper.h"
 
-void BlockContainer::setBlock(int x, int y, int z, BlockType block)
+void BlockContainer::setBlock(glm::u8vec3 pos, BlockType block)
 {
-	assert(x >= 0 && x <= 15);
-	assert(y >= 0 && y <= 15);
-	assert(z >= 0 && z <= 15);
-	_blocks[x + y * 16 + z * 256] = block;
+	assert(MathHelper::between(pos.x, 0, 15));
+	assert(MathHelper::between(pos.y, 0, 15));
+	assert(MathHelper::between(pos.z, 0, 15));
+	_blocks[posToIndex(pos)] = block;
 }
 
-BlockType BlockContainer::getBlock(int x, int y, int z) const
+BlockType BlockContainer::getBlock(glm::u8vec3 pos) const
 {
-	assert(x >= 0 && x <= 15);
-	assert(y >= 0 && y <= 15);
-	assert(z >= 0 && z <= 15);
-	return _blocks[x + y * 16 + z * 256];
+	assert(MathHelper::between(pos.x, 0, 15));
+	assert(MathHelper::between(pos.y, 0, 15));
+	assert(MathHelper::between(pos.z, 0, 15));
+	return _blocks[posToIndex(pos)];
+}
+
+int BlockContainer::posToIndex(glm::u8vec3 pos)
+{
+	return pos.x + pos.y * 16 + pos.z * 256;
+}
+
+glm::u8vec3 BlockContainer::indexToPos(int index)
+{
+	return glm::u8vec3(index % 16, (index/16) % 16, (index/256) % 16);
 }
