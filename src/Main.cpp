@@ -1,5 +1,4 @@
 #include <iostream>
-#include <windows.h>
 #include "Camera.h"
 #include "World.h"
 #include "Renderer.h"
@@ -22,8 +21,7 @@ void messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLs
 	{
 		case GL_DEBUG_SEVERITY_HIGH:
 			std::cout << fmt::format("ERROR {}: {}", id, message) << std::endl;
-			if (IsDebuggerPresent())
-				__debugbreak();
+			__debugbreak();
 			break;
 		case GL_DEBUG_SEVERITY_MEDIUM:
 			std::cout << fmt::format("WARNING {}: {}", id, message) << std::endl;
@@ -121,7 +119,12 @@ int main(int argc, char** argv)
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 
-	if (argc == 2 && strcmp(argv[1], "--windowed") == 0 || IsDebuggerPresent())
+#if _DEBUG
+	if (true)
+#else
+	if (argc == 2 && strcmp(argv[1], "--windowed") == 0)
+#endif
+
 	{
 		Toolbox::window = glfwCreateWindow(800, 600, "Meinkraft", nullptr, nullptr);
 	}
