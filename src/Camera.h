@@ -64,7 +64,7 @@ private:
 	
 	glm::dvec2 _previousMousePos;
 	
-	double _speed = 2;
+	double _speed = 10;
 	double _exposure = 1;
 	double _fov;
 	
