@@ -7,10 +7,8 @@ class NoiseGenerator
 public:
 	NoiseGenerator();
 	
-	float getNoise(float x, float y, int octaves, float scale, float lacunarity, float persistance);
+	float getNoise(float x, float y, float scale, int octaves, float lacunarity = 2.0f, float persistance = 0.5f);
 	
 private:
 	FastNoiseLite _noise;
-	
-	float getRawNoise(float x, float y, float frequency, float amplitude);
 };

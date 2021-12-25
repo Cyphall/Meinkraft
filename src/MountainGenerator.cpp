@@ -9,7 +9,7 @@ BlockContainer MountainGenerator::generate(int chunkX, int chunkY, int chunkZ)
 	{
 		for (blockPos.x = 0; blockPos.x < 16; blockPos.x++)
 		{
-			float surfaceHeightNoise = _noise.getNoise(chunkX + blockPos.x / 16.0f, chunkZ + blockPos.z / 16.0f, 6, 12, 0.4, 0.5);
+			float surfaceHeightNoise = _noise.getNoise(chunkX + blockPos.x / 16.0f, chunkZ + blockPos.z / 16.0f, 12, 3, 2, 0.5);
 			
 			int surfaceHeight = MIN_HEIGHT + static_cast<int>(surfaceHeightNoise * (MAX_HEIGHT - MIN_HEIGHT));
 			

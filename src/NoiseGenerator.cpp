@@ -6,7 +6,7 @@ NoiseGenerator::NoiseGenerator()
 	_noise.SetFrequency(1);
 }
 
-float NoiseGenerator::getNoise(float x, float y, int octaves, float scale, float lacunarity, float persistance)
+float NoiseGenerator::getNoise(float x, float y, float scale, int octaves, float lacunarity, float persistance)
 {
 	x /= scale;
 	y /= scale;
@@ -20,7 +20,10 @@ float NoiseGenerator::getNoise(float x, float y, int octaves, float scale, float
 	
 	for (int i = 0; i < octaves; i++)
 	{
-		result += getRawNoise(x, y, frequency, amplitude);
+		x *= frequency;
+		y *= frequency;
+		
+		result += _noise.GetNoise(x, y) * amplitude;
 		
 		divider += amplitude;
 		
@@ -31,12 +34,4 @@ float NoiseGenerator::getNoise(float x, float y, int octaves, float scale, float
 	result /= divider;
 	
 	return result * 0.5f + 0.5f;
-}
-
-float NoiseGenerator::getRawNoise(float x, float y, float frequency, float amplitude)
-{
-	x *= frequency;
-	y *= frequency;
-	
-	return _noise.GetNoise(x, y) * amplitude;
 }
