@@ -10,11 +10,12 @@
 #include "GL/VertexData.h"
 #include "ChunkBufferSegment.h"
 
-enum ChunkState
+enum class ChunkState
 {
 	WAITING_BLOCKS_GENERATION,
 	WAITING_MESH_GENERATION,
-	WAITING_MESH_TRANSFER,
+	WAITING_BUFFER_SEGMENT_RESERVATION,
+	WAITING_MESH_UPLOAD,
 	READY
 };
 
@@ -25,8 +26,8 @@ public:
 	
 	void initializeBlocks(WorldGenerator& worldGenerator);
 	void generateMesh();
-	
-	void transferGeneratedMesh();
+	void reserveBufferSegment();
+	void uploadMesh();
 	
 	glm::ivec3 getPosition() const;
 	
@@ -54,7 +55,7 @@ private:
 	std::vector<VertexData> _temporaryRamBuffer;
 	std::unique_ptr<ChunkBufferSegment> _bufferSegment;
 	
-	std::atomic<ChunkState> _state = WAITING_BLOCKS_GENERATION;
+	std::atomic<ChunkState> _state = ChunkState::WAITING_BLOCKS_GENERATION;
 	std::atomic<bool> _deletionFlag;
 	std::atomic<bool> _safelyDestroyableFlag; // this flags certifies this chunk is not in some queue waiting to be processed
 };

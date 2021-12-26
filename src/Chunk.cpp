@@ -13,16 +13,16 @@ _position(position)
 
 void Chunk::initializeBlocks(WorldGenerator& worldGenerator)
 {
-	if (_state != WAITING_BLOCKS_GENERATION) throw std::runtime_error("A chunk is in an invalid state.");
+	if (_state != ChunkState::WAITING_BLOCKS_GENERATION) throw std::runtime_error("A chunk is in an invalid state.");
 	
 	_blockContainer = worldGenerator.generateMountains(_position.x, _position.y, _position.z);
 	
-	_state = WAITING_MESH_GENERATION;
+	_state = ChunkState::WAITING_MESH_GENERATION;
 }
 
 void Chunk::generateMesh()
 {
-	if (_state != WAITING_MESH_GENERATION) throw std::runtime_error("A chunk is in an invalid state.");
+	if (_state != ChunkState::WAITING_MESH_GENERATION) throw std::runtime_error("A chunk is in an invalid state.");
 	
 	glm::u8vec3 pos;
 	for (pos.z = 0; pos.z < 16; pos.z++)
@@ -42,25 +42,35 @@ void Chunk::generateMesh()
 			}
 		}
 	}
-	_state = WAITING_MESH_TRANSFER;
+	if (_temporaryRamBuffer.empty())
+	{
+		_state = ChunkState::READY;
+	}
+	else
+	{
+		_state = ChunkState::WAITING_BUFFER_SEGMENT_RESERVATION;
+	}
 }
 
-void Chunk::transferGeneratedMesh()
+void Chunk::reserveBufferSegment()
 {
-	if (_state != WAITING_MESH_TRANSFER) throw std::runtime_error("A chunk is in an invalid state.");
+	if (_state != ChunkState::WAITING_BUFFER_SEGMENT_RESERVATION) throw std::runtime_error("A chunk is in an invalid state.");
 	
-	if (!_temporaryRamBuffer.empty())
-	{
-		if (!_bufferSegment)
-		{
-			Toolbox::renderer->getChunkBufferManager().acquireAvailableSegment(_bufferSegment, _temporaryRamBuffer.size());
-		}
-		
-		_bufferSegment->setData(_temporaryRamBuffer);
-		_temporaryRamBuffer = std::vector<VertexData>();
-	}
+	_bufferSegment.reset();
 	
-	_state = READY;
+	Toolbox::renderer->getChunkBufferManager().acquireAvailableSegment(_bufferSegment, _temporaryRamBuffer.size());
+	
+	_state = ChunkState::WAITING_MESH_UPLOAD;
+}
+
+void Chunk::uploadMesh()
+{
+	if (_state != ChunkState::WAITING_MESH_UPLOAD) throw std::runtime_error("A chunk is in an invalid state.");
+	
+	_bufferSegment->setData(_temporaryRamBuffer);
+	_temporaryRamBuffer = std::vector<VertexData>();
+	
+	_state = ChunkState::READY;
 }
 
 ChunkState Chunk::getState() const

@@ -24,7 +24,8 @@ private:
 	
 	tbb::concurrent_bounded_queue<Chunk*> _chunksInitQueue;
 	tbb::concurrent_bounded_queue<Chunk*> _chunkMeshGenerationQueue;
-	tbb::concurrent_bounded_queue<Chunk*> _chunkMeshTransferQueue;
+	tbb::concurrent_bounded_queue<Chunk*> _chunkMeshBufferSegmentReservationQueue;
+	tbb::concurrent_bounded_queue<Chunk*> _chunkMeshUploadQueue;
 	
 	std::thread _chunkInitThread;
 	std::thread _chunkMeshGenerationThread;

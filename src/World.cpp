@@ -30,7 +30,7 @@ void chunkInitTask(tbb::concurrent_bounded_queue<Chunk*>& chunksInitQueue, tbb::
 	
 }
 
-void chunkMeshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGenerationQueue, tbb::concurrent_bounded_queue<Chunk*>& chunkMeshTransferQueue, const std::atomic<bool>& threadsStopSignal)
+void chunkMeshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGenerationQueue, tbb::concurrent_bounded_queue<Chunk*>& chunkMeshBufferSegmentReservationQueue, const std::atomic<bool>& threadsStopSignal)
 {
 	Chunk* chunk;
 	
@@ -49,13 +49,16 @@ void chunkMeshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGen
 		
 		chunk->generateMesh();
 		
-		chunkMeshTransferQueue.push(chunk);
+		if (chunk->getState() == ChunkState::WAITING_BUFFER_SEGMENT_RESERVATION)
+		{
+			chunkMeshBufferSegmentReservationQueue.push(chunk);
+		}
 	}
 }
 
 World::World():
 _chunkInitThread(chunkInitTask, std::ref(_chunksInitQueue), std::ref(_chunkMeshGenerationQueue), std::ref(_threadsStopSignal)),
-_chunkMeshGenerationThread(chunkMeshGenerationTask, std::ref(_chunkMeshGenerationQueue), std::ref(_chunkMeshTransferQueue), std::ref(_threadsStopSignal)),
+_chunkMeshGenerationThread(chunkMeshGenerationTask, std::ref(_chunkMeshGenerationQueue), std::ref(_chunkMeshBufferSegmentReservationQueue), std::ref(_threadsStopSignal)),
 _lastFramePlayerChunkPos(getPlayerChunkPos())
 {
 	handleNewChunkPos(_lastFramePlayerChunkPos);
@@ -84,9 +87,8 @@ void World::update()
 		handleNewChunkPos(playerChunkPos);
 	}
 	
-	int transferredChunks = 0;
 	Chunk* chunk;
-	while (_chunkMeshTransferQueue.try_pop(chunk))
+	while (_chunkMeshBufferSegmentReservationQueue.try_pop(chunk))
 	{
 		if (chunk->isFlaggedForDeletion())
 		{
@@ -94,10 +96,23 @@ void World::update()
 			continue;
 		}
 		
-		chunk->transferGeneratedMesh();
-		transferredChunks++;
+		chunk->reserveBufferSegment();
+		_chunkMeshUploadQueue.push(chunk);
+	}
+	
+	int uploadedChunks = 0;
+	while (_chunkMeshUploadQueue.try_pop(chunk))
+	{
+		if (chunk->isFlaggedForDeletion())
+		{
+			chunk->confirmDeletionFlag();
+			continue;
+		}
 		
-		if (transferredChunks >= 50) break; // Prevent more than 10 chunks to be transferred every frame
+		chunk->uploadMesh();
+		uploadedChunks++;
+		
+		if (uploadedChunks >= 50) break; // Prevent more than N chunks to be uploaded every frame
 	}
 }
 
@@ -126,7 +141,7 @@ void World::handleNewChunkPos(glm::ivec3 playerChunkPos)
 		    !MathHelper::between(relativeChunkPos.z, -renderDistance, renderDistance))
 		{
 			ChunkState state = chunk->getState();
-			if (state == WAITING_BLOCKS_GENERATION || state == WAITING_MESH_GENERATION || state == WAITING_MESH_TRANSFER)
+			if (state != ChunkState::READY)
 			{
 				chunk->flagForDeletion();
 				i++;

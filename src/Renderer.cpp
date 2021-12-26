@@ -156,7 +156,7 @@ void Renderer::renderChunks()
 	{
 		const Chunk& chunk = it.second;
 		
-		if (chunk.getState() != READY) continue;
+		if (chunk.getState() != ChunkState::READY) continue;
 		if (!chunk.shouldBeDrawn()) continue;
 		if (!isInFrustum(chunk.getPosition() * 16 + 8, globalUniform.viewProjection, frustumPlanes)) continue;
 		
