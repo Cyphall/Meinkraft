@@ -5,7 +5,6 @@
 #include <glad/gl.h>
 #include <atomic>
 #include <memory>
-#include "BlockType.h"
 #include "WorldGenerator.h"
 #include "BlockContainer.h"
 #include "GL/VertexData.h"

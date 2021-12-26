@@ -146,6 +146,8 @@ int main(int argc, char** argv)
 #endif
 	glDebugMessageCallback(messageCallback, nullptr);
 	
+	BlockDefinition::init();
+	
 	Toolbox::camera = std::make_unique<Camera>(glm::dvec3(8, 170, 8));
 	Toolbox::renderer = std::make_unique<Renderer>();
 	Toolbox::world = std::make_unique<World>();

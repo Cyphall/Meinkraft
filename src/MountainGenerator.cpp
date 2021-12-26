@@ -22,19 +22,19 @@ BlockContainer MountainGenerator::generate(int chunkX, int chunkY, int chunkZ)
 				
 				if (worldSpaceBlockY < surfaceHeight - 4)
 				{
-					blockContainer.setBlock(blockPos, STONE);
+					blockContainer.setBlockId(blockPos, BlockId::STONE);
 				}
 				else if (worldSpaceBlockY < surfaceHeight - 1)
 				{
-					blockContainer.setBlock(blockPos, DIRT);
+					blockContainer.setBlockId(blockPos, BlockId::DIRT);
 				}
 				else if (worldSpaceBlockY < surfaceHeight)
 				{
-					blockContainer.setBlock(blockPos, GRASS);
+					blockContainer.setBlockId(blockPos, BlockId::GRASS);
 				}
 				else
 				{
-					blockContainer.setBlock(blockPos, AIR);
+					blockContainer.setBlockId(blockPos, BlockId::AIR);
 				}
 			}
 		}

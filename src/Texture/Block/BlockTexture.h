@@ -4,14 +4,14 @@
 #include <glad/gl.h>
 #include <string>
 
-class Texture
+class BlockTexture
 {
 public:
-	explicit Texture(const std::string& path);
-	Texture(const Texture& other) = delete;
-	Texture(Texture&& other);
+	explicit BlockTexture(const std::string& name);
+	BlockTexture(const BlockTexture& other) = delete;
+	BlockTexture(BlockTexture&& other);
 	
-	~Texture();
+	~BlockTexture();
 	
 	GLuint64 getBindlessHandle() const;
 

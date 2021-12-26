@@ -1,10 +1,10 @@
 #pragma once
 
 #include "GL/ShaderProgram.h"
-#include "GL/Texture.h"
+#include "Texture/Block/BlockTexture.h"
 #include "Camera.h"
-#include "BlockTextures.h"
 #include "ChunkBufferManager.h"
+#include "Texture/Block/BlockTextureManager.h"
 #include <memory>
 
 class Renderer
@@ -27,11 +27,9 @@ private:
 	GLuint _globalUniformBuffer;
 	GLuint _chunkUniformsBuffer;
 	
-	GLuint _texturesBuffer;
-	
-	std::vector<BlockTextures> _textures;
-	
 	ChunkBufferManager _chunkBufferManager;
+	
+	BlockTextureManager _blockTextureManager;
 	
 	void renderChunks();
 	void renderSkybox();

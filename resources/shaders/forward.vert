@@ -3,7 +3,7 @@
 layout(location = 0) in uvec3 in_position;
 layout(location = 1) in uvec2 in_uv;
 layout(location = 2) in uint in_face;
-layout(location = 3) in uint in_block;
+layout(location = 3) in uint in_textureId;
 
 struct GlobalUniform
 {
@@ -35,8 +35,7 @@ out FRAG {
     vec3 FragPos;
 } frag;
 
-flat out uint Block;
-flat out uint Face;
+flat out uint TextureId;
 
 const vec3 normalLookup[6] = vec3[](
 vec3( 1,  0,  0),
@@ -64,9 +63,8 @@ void main()
 
 	vec4 worldPosition = chunkUniforms[gl_DrawID].model * vec4(position, 1.0);
     frag.FragPos = vec3(worldPosition);
-
-    Block = in_block;
-    Face = in_face;
+	
+	TextureId = in_textureId;
 
     vec3 N = normalize(mat3(chunkUniforms[gl_DrawID].normalMatrix) * normalLookup[in_face]);
     vec3 T = normalize(mat3(chunkUniforms[gl_DrawID].normalMatrix) * tangentLookup[in_face]);

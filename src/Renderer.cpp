@@ -34,7 +34,7 @@ _skyboxShader({
 	glEnableVertexArrayAttrib(_blocksVao, 2);
 	
 	glVertexArrayAttribBinding(_blocksVao, 3, 0);
-	glVertexArrayAttribIFormat(_blocksVao, 3, 1, GL_UNSIGNED_BYTE, offsetof(VertexData, block));
+	glVertexArrayAttribIFormat(_blocksVao, 3, 1, GL_UNSIGNED_BYTE, offsetof(VertexData, texture));
 	glEnableVertexArrayAttrib(_blocksVao, 3);
 	
 	// ========== SKYBOX VAO ==========
@@ -104,25 +104,6 @@ _skyboxShader({
 	// ========== CHUNK UNIFORMS SSBO ==========
 	
 	glCreateBuffers(1, &_chunkUniformsBuffer);
-	
-	// ========== TEXTURE SSBO ==========
-	
-	glCreateBuffers(1, &_texturesBuffer);
-	
-	_textures.emplace_back("stone");
-	_textures.emplace_back("grass");
-	_textures.emplace_back("dirt");
-	_textures.emplace_back("wood");
-	_textures.emplace_back("iron");
-	
-	std::vector<BlockTextures::NativeData> textureHandles;
-	textureHandles.reserve(_textures.size());
-	for (const BlockTextures& textures : _textures)
-	{
-		textureHandles.push_back(textures.getData());
-	}
-	
-	glNamedBufferStorage(_texturesBuffer, textureHandles.size() * sizeof(BlockTextures::NativeData), textureHandles.data(), 0);
 }
 
 void Renderer::render()
@@ -186,7 +167,7 @@ void Renderer::renderChunks()
 	glNamedBufferSubData(_globalUniformBuffer, 0, sizeof(GlobalUniform), &globalUniform);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, _globalUniformBuffer);
 	
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _texturesBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _blockTextureManager.getBuffer());
 	
 	_forwardShader.bind();
 	

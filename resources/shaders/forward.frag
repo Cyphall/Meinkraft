@@ -8,11 +8,6 @@ in FRAG {
     vec3 FragPos;
 } frag;
 
-layout(bindless_sampler) struct Textures
-{
-    sampler2D handles[6];
-};
-
 struct GlobalUniform
 {
     mat4 viewProjection;
@@ -27,11 +22,10 @@ layout(std430, binding = 0) buffer _0
 
 layout(std430, binding = 2) buffer _2
 {
-    Textures textures[];
+	layout(bindless_sampler) sampler2D textures[];
 };
 
-flat in uint Block;
-flat in uint Face;
+flat in uint TextureId;
 
 out vec4 o_color;
 
@@ -44,7 +38,7 @@ void main()
     vec3 normal = frag.TangentToWorld * vec3(0, 0, 1);
     vec3 lightColor = vec3(1);
     vec3 lightDir = normalize(vec3(1, 1, 1));
-    vec3 albedo = texture(textures[Block].handles[Face], frag.TexCoords).rgb;
+    vec3 albedo = texture(textures[TextureId], frag.TexCoords).rgb;
 
     vec3 finalColor = vec3(0);
 

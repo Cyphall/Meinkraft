@@ -2,7 +2,7 @@
 #include "BlockContainer.h"
 #include "Helper/MathHelper.h"
 
-void BlockContainer::setBlock(glm::u8vec3 pos, BlockType block)
+void BlockContainer::setBlockId(glm::u8vec3 pos, BlockId block)
 {
 	assert(MathHelper::between(pos.x, 0, 15));
 	assert(MathHelper::between(pos.y, 0, 15));
@@ -10,7 +10,7 @@ void BlockContainer::setBlock(glm::u8vec3 pos, BlockType block)
 	_blocks[posToIndex(pos)] = block;
 }
 
-BlockType BlockContainer::getBlock(glm::u8vec3 pos) const
+BlockId BlockContainer::getBlockId(glm::u8vec3 pos) const
 {
 	assert(MathHelper::between(pos.x, 0, 15));
 	assert(MathHelper::between(pos.y, 0, 15));
@@ -26,4 +26,10 @@ int BlockContainer::posToIndex(glm::u8vec3 pos)
 glm::u8vec3 BlockContainer::indexToPos(int index)
 {
 	return glm::u8vec3(index % 16, (index/16) % 16, (index/256) % 16);
+}
+
+BlockDefinition* BlockContainer::getBlockDefinition(glm::u8vec3 pos) const
+{
+	BlockId blockId = getBlockId(pos);
+	return BlockDefinition::getBlockDefinition(blockId);
 }

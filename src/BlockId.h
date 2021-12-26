@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-enum BlockType : uint8_t
+enum class BlockId : uint8_t
 {
 	STONE = 0,
 	GRASS = 1,
