@@ -30,7 +30,7 @@ private:
 	};
 	
 	std::set<ChunkBufferSegment*, BufferSegmentCompare> _bufferSegments;
-	GLuint _vbo;
+	GLuint _vbo = -1;
 	
 	friend class ChunkBufferSegment;
 	friend class ChunkBufferManager;
