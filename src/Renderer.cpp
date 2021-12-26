@@ -147,9 +147,12 @@ void Renderer::renderChunks()
 	const std::array<FrustumPlane, 4>& frustumPlanes = Toolbox::camera->getFrustumPlanes();
 	
 	std::map<const ChunkBuffer*, std::vector<const Chunk*>> chunksToDraw;
+	int maxChunkCount = 0;
 	for (auto& buffer : _chunkBufferManager.getBuffers())
 	{
-		chunksToDraw[buffer.get()].reserve(buffer->getActiveSegmentCount());
+		int chunkCount = buffer->getActiveSegmentCount();
+		chunksToDraw[buffer.get()].reserve(chunkCount);
+		maxChunkCount = std::max(maxChunkCount, chunkCount);
 	}
 	
 	for (auto& it : Toolbox::world->getChunks())
@@ -166,6 +169,9 @@ void Renderer::renderChunks()
 	
 	glNamedBufferSubData(_globalUniformBuffer, 0, sizeof(GlobalUniform), &globalUniform);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, _globalUniformBuffer);
+	
+	glNamedBufferData(_chunkUniformsBuffer, maxChunkCount * sizeof(ChunkUniform), nullptr, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _chunkUniformsBuffer);
 	
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _blockTextureManager.getBuffer());
 	
@@ -194,8 +200,7 @@ void Renderer::renderChunks()
 			chunkVerticeCounts.push_back(segment->getVertexCount());
 		}
 		
-		glNamedBufferData(_chunkUniformsBuffer, chunkUniforms.size() * sizeof(ChunkUniform), chunkUniforms.data(), GL_DYNAMIC_DRAW);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _chunkUniformsBuffer);
+		glNamedBufferSubData(_chunkUniformsBuffer, 0, chunkUniforms.size() * sizeof(ChunkUniform), chunkUniforms.data());
 		
 		glVertexArrayVertexBuffer(_blocksVao, 0, chunkBuffer->getGLBuffer(), 0, sizeof(VertexData));
 		
