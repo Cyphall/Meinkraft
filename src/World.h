@@ -22,13 +22,13 @@ private:
 	
 	glm::ivec3 _lastFramePlayerChunkPos;
 	
-	tbb::concurrent_bounded_queue<Chunk*> _chunksInitQueue;
-	tbb::concurrent_bounded_queue<Chunk*> _chunkMeshGenerationQueue;
-	tbb::concurrent_bounded_queue<Chunk*> _chunkMeshBufferSegmentReservationQueue;
-	tbb::concurrent_bounded_queue<Chunk*> _chunkMeshUploadQueue;
+	tbb::concurrent_bounded_queue<Chunk*> _blockGenerationQueue;
+	tbb::concurrent_bounded_queue<Chunk*> _meshGenerationQueue;
+	tbb::concurrent_bounded_queue<Chunk*> _meshBufferSegmentReservationQueue;
+	tbb::concurrent_bounded_queue<Chunk*> _meshUploadQueue;
 	
-	std::thread _chunkInitThread;
-	std::thread _chunkMeshGenerationThread;
+	std::thread _blockGenerationThread;
+	std::thread _meshGenerationThread;
 	
 	std::atomic<bool> _threadsStopSignal = false;
 	

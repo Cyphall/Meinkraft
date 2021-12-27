@@ -5,14 +5,14 @@
 #include "Toolbox.h"
 #include "Helper/MathHelper.h"
 
-void chunkInitTask(tbb::concurrent_bounded_queue<Chunk*>& chunksInitQueue, tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGenerationQueue, const std::atomic<bool>& threadsStopSignal)
+void blockGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& inputQueue, tbb::concurrent_bounded_queue<Chunk*>& outputQueue, const std::atomic<bool>& threadsStopSignal)
 {
 	WorldGenerator worldGenerator;
 	Chunk* chunk;
 	
 	while (true)
 	{
-		chunksInitQueue.pop(chunk);
+		inputQueue.pop(chunk);
 		
 		if (threadsStopSignal)
 			break;
@@ -25,18 +25,18 @@ void chunkInitTask(tbb::concurrent_bounded_queue<Chunk*>& chunksInitQueue, tbb::
 		
 		chunk->initializeBlocks(worldGenerator);
 		
-		chunkMeshGenerationQueue.push(chunk);
+		outputQueue.push(chunk);
 	}
 	
 }
 
-void chunkMeshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGenerationQueue, tbb::concurrent_bounded_queue<Chunk*>& chunkMeshBufferSegmentReservationQueue, const std::atomic<bool>& threadsStopSignal)
+void meshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& inputQueue, tbb::concurrent_bounded_queue<Chunk*>& outputQueue, const std::atomic<bool>& threadsStopSignal)
 {
 	Chunk* chunk;
 	
 	while (true)
 	{
-		chunkMeshGenerationQueue.pop(chunk);
+		inputQueue.pop(chunk);
 		
 		if (threadsStopSignal)
 			break;
@@ -51,16 +51,17 @@ void chunkMeshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& chunkMeshGen
 		
 		if (chunk->getState() == ChunkState::WAITING_BUFFER_SEGMENT_RESERVATION)
 		{
-			chunkMeshBufferSegmentReservationQueue.push(chunk);
+			outputQueue.push(chunk);
 		}
 	}
 }
 
 World::World():
-_chunkInitThread(chunkInitTask, std::ref(_chunksInitQueue), std::ref(_chunkMeshGenerationQueue), std::ref(_threadsStopSignal)),
-_chunkMeshGenerationThread(chunkMeshGenerationTask, std::ref(_chunkMeshGenerationQueue), std::ref(_chunkMeshBufferSegmentReservationQueue), std::ref(_threadsStopSignal)),
 _lastFramePlayerChunkPos(getPlayerChunkPos())
 {
+	_blockGenerationThread = std::thread(blockGenerationTask, std::ref(_blockGenerationQueue), std::ref(_meshGenerationQueue), std::ref(_threadsStopSignal));
+	_meshGenerationThread = std::thread(meshGenerationTask, std::ref(_meshGenerationQueue), std::ref(_meshBufferSegmentReservationQueue), std::ref(_threadsStopSignal));
+	
 	handleNewChunkPos(_lastFramePlayerChunkPos);
 }
 
@@ -68,13 +69,13 @@ World::~World()
 {
 	_threadsStopSignal = true;
 	
-	_chunksInitQueue.push(nullptr);
-	_chunkMeshGenerationQueue.push(nullptr);
+	_blockGenerationQueue.push(nullptr);
+	_meshGenerationQueue.push(nullptr);
 	
-	if (_chunkInitThread.joinable())
-		_chunkInitThread.join();
-	if (_chunkMeshGenerationThread.joinable())
-		_chunkMeshGenerationThread.join();
+	if (_blockGenerationThread.joinable())
+		_blockGenerationThread.join();
+	if (_meshGenerationThread.joinable())
+		_meshGenerationThread.join();
 }
 
 void World::update()
@@ -88,7 +89,7 @@ void World::update()
 	}
 	
 	Chunk* chunk;
-	while (_chunkMeshBufferSegmentReservationQueue.try_pop(chunk))
+	while (_meshBufferSegmentReservationQueue.try_pop(chunk))
 	{
 		if (chunk->isFlaggedForDeletion())
 		{
@@ -97,11 +98,11 @@ void World::update()
 		}
 		
 		chunk->reserveBufferSegment();
-		_chunkMeshUploadQueue.push(chunk);
+		_meshUploadQueue.push(chunk);
 	}
 	
 	int uploadedChunks = 0;
-	while (_chunkMeshUploadQueue.try_pop(chunk))
+	while (_meshUploadQueue.try_pop(chunk))
 	{
 		if (chunk->isFlaggedForDeletion())
 		{
@@ -171,7 +172,7 @@ void World::handleNewChunkPos(glm::ivec3 playerChunkPos)
 					auto pair = _chunks.try_emplace(relativeChunkPos, relativeChunkPos);
 					if (pair.second)
 					{
-						_chunksInitQueue.push(&pair.first->second);
+						_blockGenerationQueue.push(&pair.first->second);
 					}
 				}
 			}
