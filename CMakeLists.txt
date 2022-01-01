@@ -13,7 +13,6 @@ set_property(TARGET Meinkraft PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CO
 
 target_compile_features(Meinkraft PRIVATE cxx_std_20)
 target_compile_options(Meinkraft PRIVATE /Zc:__cplusplus)
-target_compile_options(Meinkraft PRIVATE $<$<CONFIG:Release>:-O2>)
 
 find_path(STB_INCLUDE_DIRS "stb.h")
 find_package(glfw3 CONFIG REQUIRED)
