@@ -1,13 +1,8 @@
 #version 460 core
 
+// ---------- DEFINITIONS ----------
+
 #define PI 3.14159265359f
-
-layout(location = 0) out vec3 o_color;
-
-in V2F
-{
-	vec3 fragDir;
-} v2f;
 
 vec3 background(vec3 dir);
 vec3 srgbToLinear(vec3 srgb);
@@ -15,9 +10,19 @@ vec3 linearToSRGB(vec3 linear);
 float degToRad(float deg);
 float radToDeg(float rad);
 
+// ---------- INPUTS ----------
+layout(location = 0) in vec3 i_fragDir;
+// ---------- UNIFORMS ----------
+
+// ---------- OUTPUTS ----------
+
+layout(location = 0) out vec3 o_color;
+
+// ---------- LOGIC ----------
+
 void main()
 {
-	vec3 fragDir = normalize(v2f.fragDir);
+	vec3 fragDir = normalize(i_fragDir);
 	
 	vec3 sunDir = normalize(vec3(1, 1, 1));
 	float fragDirDotSun = max(dot(fragDir, sunDir), 0);
