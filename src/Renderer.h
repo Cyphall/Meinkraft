@@ -17,10 +17,10 @@ public:
 	ChunkBufferManager& getChunkBufferManager();
 
 private:
-	ShaderProgram _forwardShader;
+	std::unique_ptr<ShaderProgram> _forwardShader;
 	GLuint _blocksVao;
 	
-	ShaderProgram _skyboxShader;
+	std::unique_ptr<ShaderProgram> _skyboxShader;
 	GLuint _skyboxVao;
 	GLuint _skyboxVbo;
 	

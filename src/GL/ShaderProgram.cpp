@@ -1,12 +1,15 @@
 #include "ShaderProgram.h"
 #include <stdexcept>
 #include <ios>
+#include <sstream>
 #include "../Helper/ShaderHelper.h"
 #include "../Helper/FileHelper.h"
 #include "../Helper/StringHelper.h"
-#include "fmt/format.h"
+#include <fmt/format.h>
+#include <numeric>
+#include <glm/gtc/type_ptr.hpp>
 
-ShaderProgram::ShaderProgram(const std::map<GLenum, std::string>& createInfo)
+ShaderProgram::ShaderProgram(const ShaderProgramCreateInfo& createInfo)
 {
 	_handle = glCreateProgram();
 	if (_handle == 0)
@@ -16,7 +19,7 @@ ShaderProgram::ShaderProgram(const std::map<GLenum, std::string>& createInfo)
 	
 	std::vector<GLuint> shaders;
 	
-	for (const auto& [type, files] : createInfo)
+	for (const auto& [type, files] : createInfo.shadersFiles)
 	{
 		GLuint shader = loadShader(type, files);
 		glAttachShader(_handle, shader);
@@ -43,7 +46,15 @@ ShaderProgram::ShaderProgram(const std::map<GLenum, std::string>& createInfo)
 		error.resize(length - 1);
 		glGetProgramInfoLog(_handle, length, nullptr, error.data());
 		
-		throw std::runtime_error(fmt::format("Error while linking shaders to program: {}", error));
+		std::string formattedFiles;
+		for (const std::pair<GLenum, std::vector<std::string>>& files : createInfo.shadersFiles)
+		{
+			std::string extension = ShaderHelper::shaderTypeToExtension(files.first);
+			for (const std::string& file : files.second)
+				formattedFiles += fmt::format("{}.{}\n", file, extension);
+		}
+		
+		throw std::runtime_error(fmt::format("Error while linking shaders:\n{}{}", formattedFiles, error));
 	}
 	
 	int uniformCount;
@@ -97,7 +108,7 @@ void ShaderProgram::bind()
 	glUseProgram(_handle);
 }
 
-GLuint ShaderProgram::loadShader(GLenum type, const std::string& file)
+GLuint ShaderProgram::loadShader(GLenum type, const std::vector<std::string>& files)
 {
 	GLuint shader = glCreateShader(type);
 	
@@ -110,14 +121,16 @@ GLuint ShaderProgram::loadShader(GLenum type, const std::string& file)
 	
 	std::string extension = ShaderHelper::shaderTypeToExtension(type);
 	
-	try
+	for (const std::string& file : files)
 	{
-		source += FileHelper::readAllText(fmt::format("resources/shaders/{}.{}", file, extension));
-	}
-	catch (const std::ios_base::failure& e)
-	{
-		throw std::runtime_error(fmt::format("Unable to open shader file \"{}.{}\"", file, extension));
-		throw e;
+		try
+		{
+			source += FileHelper::readAllText(fmt::format("resources/shaders/{}.{}", file, extension));
+		}
+		catch (const std::ios_base::failure& e)
+		{
+			throw std::runtime_error(fmt::format("Unable to open shader file \"{}.{}\"", file, extension));
+		}
 	}
 	
 	const char* c_source = source.c_str();
@@ -136,7 +149,11 @@ GLuint ShaderProgram::loadShader(GLenum type, const std::string& file)
 		error.resize(length - 1);
 		glGetShaderInfoLog(shader, length, nullptr, error.data());
 		
-		throw std::runtime_error(fmt::format("Error while compiling shader: {}", error));
+		std::string formattedFiles;
+		for (const std::string& file : files)
+			formattedFiles += fmt::format("{}.{}\n", file, extension);
+		
+		throw std::runtime_error(fmt::format("Error while compiling shaders:\n{}{}", formattedFiles, error));
 	}
 	
 	return shader;
@@ -144,12 +161,23 @@ GLuint ShaderProgram::loadShader(GLenum type, const std::string& file)
 
 int ShaderProgram::getUniformLocation(const char* name)
 {
-	try
-	{
-		return _uniforms.at(name);
-	}
-	catch (const std::out_of_range& e)
-	{
-		return -1;
-	}
+	auto it = _uniforms.find(name);
+	return it != _uniforms.end() ? it->second : -1;
+}
+
+void ShaderProgram::dispatch(glm::ivec3 groups)
+{
+	glDispatchCompute(groups.x, groups.y, groups.z);
+}
+
+void ShaderProgram::dispatchAuto(glm::ivec3 workResolution)
+{
+	dispatch(glm::ivec3(glm::ceil(glm::vec3(workResolution) / glm::vec3(getWorkGroupSize()))));
+}
+
+glm::ivec3 ShaderProgram::getWorkGroupSize() const
+{
+	glm::ivec3 workGroupSize;
+	glGetProgramiv(_handle, GL_COMPUTE_WORK_GROUP_SIZE, glm::value_ptr(workGroupSize));
+	return workGroupSize;
 }

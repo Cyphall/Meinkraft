@@ -5,14 +5,18 @@
 #include <string>
 #include "glad/gl.h"
 #include "glm/glm.hpp"
+#include "ShaderProgramCreateInfo.h"
 
 class ShaderProgram
 {
 public:
-	explicit ShaderProgram(const std::map<GLenum, std::string>& createInfo);
+	explicit ShaderProgram(const ShaderProgramCreateInfo& createInfo);
 	~ShaderProgram();
 	
 	void bind();
+	void dispatch(glm::ivec3 groups);
+	void dispatchAuto(glm::ivec3 workResolution);
+	glm::ivec3 getWorkGroupSize() const;
 
 #pragma region float
 	
@@ -61,7 +65,7 @@ public:
 	void setUniform(const char* name, const glm::uvec2& data);
 	void setUniform(const char* name, const glm::uvec3& data);
 	void setUniform(const char* name, const glm::uvec4& data);
-
+	
 #pragma endregion
 
 #pragma region bool
@@ -75,7 +79,7 @@ public:
 	void setUniform(const char* name, const glm::bvec2& data);
 	void setUniform(const char* name, const glm::bvec3& data);
 	void setUniform(const char* name, const glm::bvec4& data);
-
+	
 #pragma endregion
 
 #pragma region texture
@@ -87,10 +91,10 @@ public:
 #pragma endregion
 
 private:
-	GLuint _handle;
+	GLuint _handle = -1;
 	
 	std::map<std::string, int> _uniforms;
-	static GLuint loadShader(GLenum type, const std::string& file);
+	static GLuint loadShader(GLenum type, const std::vector<std::string>& files);
 	
 	int getUniformLocation(const char* name);
 };

@@ -149,7 +149,15 @@ int main(int argc, char** argv)
 	BlockDefinition::init();
 	
 	Toolbox::camera = std::make_unique<Camera>(glm::dvec3(8, 170, 8));
-	Toolbox::renderer = std::make_unique<Renderer>();
+	try
+	{
+		Toolbox::renderer = std::make_unique<Renderer>();
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		throw e;
+	}
 	Toolbox::world = std::make_unique<World>();
 	
 	double previousTime = 0;

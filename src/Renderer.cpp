@@ -7,16 +7,26 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include "ChunkBuffer.h"
 
-Renderer::Renderer():
-_forwardShader({
-	{GL_VERTEX_SHADER, "forward"},
-	{GL_FRAGMENT_SHADER, "forward"}
-}),
-_skyboxShader({
-	{GL_VERTEX_SHADER, "skybox"},
-	{GL_FRAGMENT_SHADER, "skybox"}
-})
+Renderer::Renderer()
 {
+	// ========== SHADERS ==========
+	
+	{
+		ShaderProgramCreateInfo createInfo;
+		createInfo.shadersFiles[GL_VERTEX_SHADER].emplace_back("forward");
+		createInfo.shadersFiles[GL_FRAGMENT_SHADER].emplace_back("forward");
+		
+		_forwardShader = std::make_unique<ShaderProgram>(createInfo);
+	}
+	
+	{
+		ShaderProgramCreateInfo createInfo;
+		createInfo.shadersFiles[GL_VERTEX_SHADER].emplace_back("skybox");
+		createInfo.shadersFiles[GL_FRAGMENT_SHADER].emplace_back("skybox");
+		
+		_skyboxShader = std::make_unique<ShaderProgram>(createInfo);
+	}
+	
 	// ========== MAIN VAO ==========
 	
 	glCreateVertexArrays(1, &_blocksVao);
@@ -175,7 +185,7 @@ void Renderer::renderChunks()
 	
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _blockTextureManager.getBuffer());
 	
-	_forwardShader.bind();
+	_forwardShader->bind();
 	
 	std::vector<ChunkUniform> chunkUniforms;
 	std::vector<GLint> chunkStartIndices;
@@ -220,13 +230,13 @@ void Renderer::renderSkybox()
 	
 	glBindVertexArray(_skyboxVao);
 	
-	_skyboxShader.bind();
+	_skyboxShader->bind();
 	
 	glm::mat4 mvp =
 		Toolbox::camera->getProjection() *
 		glm::mat4(glm::mat3(Toolbox::camera->getView()));
 	
-	_skyboxShader.setUniform("u_mvp", mvp);
+	_skyboxShader->setUniform("u_mvp", mvp);
 	
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	
