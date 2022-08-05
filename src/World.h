@@ -4,7 +4,8 @@
 #include <glm/gtx/hash.hpp>
 #include <unordered_map>
 #include "Chunk.h"
-#include <tbb/concurrent_queue.h>
+#include "ConcurrentChunkTaskQueue.h"
+#include "MainThreadChunkTaskQueue.h"
 #include <thread>
 
 class World
@@ -22,15 +23,10 @@ private:
 	
 	glm::ivec3 _lastFramePlayerChunkPos;
 	
-	tbb::concurrent_bounded_queue<Chunk*> _blockGenerationQueue;
-	tbb::concurrent_bounded_queue<Chunk*> _meshGenerationQueue;
-	tbb::concurrent_bounded_queue<Chunk*> _meshBufferSegmentReservationQueue;
-	tbb::concurrent_bounded_queue<Chunk*> _meshUploadQueue;
-	
-	std::thread _blockGenerationThread;
-	std::thread _meshGenerationThread;
-	
-	std::atomic<bool> _threadsStopSignal = false;
+	ConcurrentChunkTaskQueue _threadPoolQueue;
+	MainThreadChunkTaskQueue _mainThreadQueue;
+
+	std::vector<std::thread> _threads;
 	
 	void handleNewChunkPos(glm::ivec3 playerChunkPos);
 	

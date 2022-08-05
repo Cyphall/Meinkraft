@@ -4,42 +4,42 @@
 #include "Camera.h"
 #include "Toolbox.h"
 #include "Helper/MathHelper.h"
+#include <magic_enum.hpp>
+#include "Helper/SpecHelper.h"
 
-void blockGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& inputQueue, tbb::concurrent_bounded_queue<Chunk*>& outputQueue, const std::atomic<bool>& threadsStopSignal)
+static void dispatchChunkToNextTask(Chunk* chunk, ConcurrentChunkTaskQueue& threadPoolQueue, MainThreadChunkTaskQueue& mainThreadQueue)
 {
-	WorldGenerator worldGenerator;
-	Chunk* chunk;
-	
-	while (true)
+	switch (chunk->getState())
 	{
-		inputQueue.pop(chunk);
-		
-		if (threadsStopSignal)
+		case ChunkState::WAITING_BLOCKS_GENERATION:
+			threadPoolQueue.push(chunk);
 			break;
-		
-		if (chunk->isFlaggedForDeletion())
-		{
-			chunk->confirmDeletionFlag();
-			continue;
-		}
-		
-		chunk->initializeBlocks(worldGenerator);
-		
-		outputQueue.push(chunk);
+		case ChunkState::WAITING_MESH_GENERATION:
+			threadPoolQueue.push(chunk);
+			break;
+		case ChunkState::WAITING_BUFFER_SEGMENT_RESERVATION:
+			mainThreadQueue.push(chunk);
+			break;
+		case ChunkState::WAITING_MESH_UPLOAD:
+			mainThreadQueue.push(chunk);
+			break;
+		case ChunkState::READY:
+			break;
 	}
-	
 }
 
-void meshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& inputQueue, tbb::concurrent_bounded_queue<Chunk*>& outputQueue, const std::atomic<bool>& threadsStopSignal)
+void threadTask(ConcurrentChunkTaskQueue& threadPoolQueue, MainThreadChunkTaskQueue& mainThreadQueue)
 {
-	Chunk* chunk;
+	WorldGenerator worldGenerator;
 	
 	while (true)
 	{
-		inputQueue.pop(chunk);
+		Chunk* chunk = threadPoolQueue.pop();
 		
-		if (threadsStopSignal)
+		if (chunk == nullptr)
+		{
 			break;
+		}
 		
 		if (chunk->isFlaggedForDeletion())
 		{
@@ -47,35 +47,42 @@ void meshGenerationTask(tbb::concurrent_bounded_queue<Chunk*>& inputQueue, tbb::
 			continue;
 		}
 		
-		chunk->generateMesh();
-		
-		if (chunk->getState() == ChunkState::WAITING_BUFFER_SEGMENT_RESERVATION)
+		switch (chunk->getState())
 		{
-			outputQueue.push(chunk);
+			case ChunkState::WAITING_BLOCKS_GENERATION:
+				chunk->initializeBlocks(worldGenerator);
+				break;
+			case ChunkState::WAITING_MESH_GENERATION:
+				chunk->generateMesh();
+				break;
+			default:
+				throw std::logic_error("This exception is not supposed to be reachable.");
 		}
+		
+		dispatchChunkToNextTask(chunk, threadPoolQueue, mainThreadQueue);
 	}
 }
 
 World::World():
 _lastFramePlayerChunkPos(getPlayerChunkPos())
 {
-	_blockGenerationThread = std::thread(blockGenerationTask, std::ref(_blockGenerationQueue), std::ref(_meshGenerationQueue), std::ref(_threadsStopSignal));
-	_meshGenerationThread = std::thread(meshGenerationTask, std::ref(_meshGenerationQueue), std::ref(_meshBufferSegmentReservationQueue), std::ref(_threadsStopSignal));
+	int threadCount = std::max(SpecHelper::getPhysicalCoreCount() - 1, 1);
+	for (int i = 0; i < threadCount; i++)
+	{
+		_threads.emplace_back(threadTask, std::ref(_threadPoolQueue), std::ref(_mainThreadQueue));
+	}
 	
 	handleNewChunkPos(_lastFramePlayerChunkPos);
 }
 
 World::~World()
 {
-	_threadsStopSignal = true;
+	_threadPoolQueue.stop(_threads.size());
 	
-	_blockGenerationQueue.push(nullptr);
-	_meshGenerationQueue.push(nullptr);
-	
-	if (_blockGenerationThread.joinable())
-		_blockGenerationThread.join();
-	if (_meshGenerationThread.joinable())
-		_meshGenerationThread.join();
+	for (int i = 0; i < _threads.size(); i++)
+	{
+		_threads[i].join();
+	}
 }
 
 void World::update()
@@ -89,7 +96,7 @@ void World::update()
 	}
 	
 	Chunk* chunk;
-	while (_meshBufferSegmentReservationQueue.try_pop(chunk))
+	while (_mainThreadQueue.tryPop(chunk))
 	{
 		if (chunk->isFlaggedForDeletion())
 		{
@@ -97,23 +104,19 @@ void World::update()
 			continue;
 		}
 		
-		chunk->reserveBufferSegment();
-		_meshUploadQueue.push(chunk);
-	}
-	
-	int uploadedChunks = 0;
-	while (_meshUploadQueue.try_pop(chunk))
-	{
-		if (chunk->isFlaggedForDeletion())
+		switch (chunk->getState())
 		{
-			chunk->confirmDeletionFlag();
-			continue;
+			case ChunkState::WAITING_BUFFER_SEGMENT_RESERVATION:
+				chunk->reserveBufferSegment();
+				break;
+			case ChunkState::WAITING_MESH_UPLOAD:
+				chunk->uploadMesh();
+				break;
+			default:
+				throw std::logic_error(std::format("This chunk state is not supposed to be processed by the main thread: {}", magic_enum::enum_name(chunk->getState())));
 		}
 		
-		chunk->uploadMesh();
-		uploadedChunks++;
-		
-		if (uploadedChunks >= 50) break; // Prevent more than N chunks to be uploaded every frame
+		dispatchChunkToNextTask(chunk, _threadPoolQueue, _mainThreadQueue);
 	}
 }
 
@@ -172,7 +175,7 @@ void World::handleNewChunkPos(glm::ivec3 playerChunkPos)
 					auto pair = _chunks.try_emplace(relativeChunkPos, relativeChunkPos);
 					if (pair.second)
 					{
-						_blockGenerationQueue.push(&pair.first->second);
+						dispatchChunkToNextTask(&pair.first->second, _threadPoolQueue, _mainThreadQueue);
 					}
 				}
 			}
