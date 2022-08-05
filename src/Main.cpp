@@ -139,8 +139,8 @@ int main(int argc, char** argv)
 	glfwSetInputMode(Toolbox::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetInputMode(Toolbox::window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	
-	glEnable(GL_DEBUG_OUTPUT);
 #if _DEBUG
+	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 //	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 #endif
