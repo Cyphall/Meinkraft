@@ -3,7 +3,7 @@
 #include "World.h"
 #include "Renderer.h"
 #include "Toolbox.h"
-#include <fmt/format.h>
+#include <format>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -20,14 +20,14 @@ void messageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLs
 	switch (severity)
 	{
 		case GL_DEBUG_SEVERITY_HIGH:
-			std::cout << fmt::format("ERROR {}: {}", id, message) << std::endl;
+			std::cout << std::format("ERROR {}: {}", id, message) << std::endl;
 			__debugbreak();
 			break;
 		case GL_DEBUG_SEVERITY_MEDIUM:
-			std::cout << fmt::format("WARNING {}: {}", id, message) << std::endl;
+			std::cout << std::format("WARNING {}: {}", id, message) << std::endl;
 			break;
 		case GL_DEBUG_SEVERITY_LOW:
-			std::cout << fmt::format("INFO {}: {}", id, message) << std::endl;
+			std::cout << std::format("INFO {}: {}", id, message) << std::endl;
 			break;
 //		case GL_DEBUG_SEVERITY_NOTIFICATION:
 //			std::cout << fmt::format("NOTIF {}: {}", id, message) << std::endl;

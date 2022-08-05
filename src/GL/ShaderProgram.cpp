@@ -5,7 +5,7 @@
 #include "../Helper/ShaderHelper.h"
 #include "../Helper/FileHelper.h"
 #include "../Helper/StringHelper.h"
-#include <fmt/format.h>
+#include <format>
 #include <numeric>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -51,10 +51,10 @@ ShaderProgram::ShaderProgram(const ShaderProgramCreateInfo& createInfo)
 		{
 			std::string extension = ShaderHelper::shaderTypeToExtension(files.first);
 			for (const std::string& file : files.second)
-				formattedFiles += fmt::format("{}.{}\n", file, extension);
+				formattedFiles += std::format("{}.{}\n", file, extension);
 		}
 		
-		throw std::runtime_error(fmt::format("Error while linking shaders:\n{}{}", formattedFiles, error));
+		throw std::runtime_error(std::format("Error while linking shaders:\n{}{}", formattedFiles, error));
 	}
 	
 	int uniformCount;
@@ -86,7 +86,7 @@ ShaderProgram::ShaderProgram(const ShaderProgramCreateInfo& createInfo)
 			
 			for (int j = 0; j < values[1]; j++)
 			{
-				std::string fullName = fmt::format("{}[{}]", name, j);
+				std::string fullName = std::format("{}[{}]", name, j);
 				
 				_uniforms[fullName] = glGetUniformLocation(_handle, fullName.c_str());
 			}
@@ -125,11 +125,11 @@ GLuint ShaderProgram::loadShader(GLenum type, const std::vector<std::string>& fi
 	{
 		try
 		{
-			source += FileHelper::readAllText(fmt::format("resources/shaders/{}.{}", file, extension));
+			source += FileHelper::readAllText(std::format("resources/shaders/{}.{}", file, extension));
 		}
 		catch (const std::ios_base::failure& e)
 		{
-			throw std::runtime_error(fmt::format("Unable to open shader file \"{}.{}\"", file, extension));
+			throw std::runtime_error(std::format("Unable to open shader file \"{}.{}\"", file, extension));
 		}
 	}
 	
@@ -151,9 +151,9 @@ GLuint ShaderProgram::loadShader(GLenum type, const std::vector<std::string>& fi
 		
 		std::string formattedFiles;
 		for (const std::string& file : files)
-			formattedFiles += fmt::format("{}.{}\n", file, extension);
+			formattedFiles += std::format("{}.{}\n", file, extension);
 		
-		throw std::runtime_error(fmt::format("Error while compiling shaders:\n{}{}", formattedFiles, error));
+		throw std::runtime_error(std::format("Error while compiling shaders:\n{}{}", formattedFiles, error));
 	}
 	
 	return shader;

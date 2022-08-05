@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <fmt/format.h>
+#include <format>
 
 class ShaderHelper
 {
@@ -17,7 +17,7 @@ public:
 			case GL_GEOMETRY_SHADER:
 				return "geom";
 			default:
-				throw std::runtime_error(fmt::format("Shader type {} is not currently supported", type));
+				throw std::runtime_error(std::format("Shader type {} is not currently supported", type));
 		}
 	}
 };

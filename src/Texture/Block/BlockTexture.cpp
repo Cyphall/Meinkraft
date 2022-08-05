@@ -1,6 +1,6 @@
 #include "BlockTexture.h"
 #include <stb_image.h>
-#include <fmt/format.h>
+#include <format>
 
 BlockTexture::BlockTexture(const std::string& name)
 {
@@ -13,7 +13,7 @@ BlockTexture::BlockTexture(const std::string& name)
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisoCount);
 	glTextureParameterf(_handle, GL_TEXTURE_MAX_ANISOTROPY, anisoCount);
 	
-	stbi_uc* data = stbi_load(fmt::format("resources/textures/{}.png", name).c_str(), &_size.x, &_size.y, nullptr, 3);
+	stbi_uc* data = stbi_load(std::format("resources/textures/{}.png", name).c_str(), &_size.x, &_size.y, nullptr, 3);
 	glTextureStorage2D(_handle, calculateMipmapCount(_size), GL_SRGB8, _size.x, _size.y);
 	glTextureSubImage2D(_handle, 0, 0, 0, _size.x, _size.y, GL_RGB, GL_UNSIGNED_BYTE, data);
 	stbi_image_free(data);

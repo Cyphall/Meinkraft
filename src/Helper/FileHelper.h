@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <fmt/format.h>
+#include <format>
 
 class FileHelper
 {
@@ -21,6 +21,6 @@ public:
 			in.close();
 			return contents;
 		}
-		throw std::ios_base::failure(fmt::format("Could not find file \"{}\"", path));
+		throw std::ios_base::failure(std::format("Could not find file \"{}\"", path));
 	}
 };
