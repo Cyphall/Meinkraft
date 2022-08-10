@@ -1,8 +1,9 @@
 #pragma once
 
+#include "Meinkraft/Texture/Block/BlockTextureId.h"
+#include "Meinkraft/Texture/Block/BlockTexture.h"
+
 #include <map>
-#include "BlockTextureId.h"
-#include "BlockTexture.h"
 
 class BlockTextureManager
 {

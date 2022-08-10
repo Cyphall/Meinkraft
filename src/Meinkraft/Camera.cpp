@@ -1,7 +1,8 @@
 #include "Camera.h"
-#include <glm/gtc/matrix_transform.hpp>
-#include "Toolbox.h"
 
+#include "Meinkraft/Toolbox.h"
+
+#include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
 glm::dvec3 Camera::getOrientation()

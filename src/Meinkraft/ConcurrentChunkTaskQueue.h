@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Meinkraft/Chunk.h"
+
 #include <queue>
 #include <mutex>
 #include <semaphore>
-
-#include "Chunk.h"
 
 class ConcurrentChunkTaskQueue
 {

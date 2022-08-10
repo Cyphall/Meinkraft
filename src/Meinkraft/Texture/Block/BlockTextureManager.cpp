@@ -1,4 +1,5 @@
 #include "BlockTextureManager.h"
+
 #include <array>
 
 BlockTextureManager::BlockTextureManager()

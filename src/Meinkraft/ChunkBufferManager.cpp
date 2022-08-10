@@ -1,5 +1,4 @@
 #include "ChunkBufferManager.h"
-#include "ChunkBuffer.h"
 
 void ChunkBufferManager::acquireAvailableSegment(std::unique_ptr<ChunkBufferSegment>& segment, int requestedVertexCount)
 {

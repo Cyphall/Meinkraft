@@ -1,6 +1,8 @@
-#include <cassert>
 #include "BlockContainer.h"
-#include "Helper/MathHelper.h"
+
+#include "Meinkraft/Helper/MathHelper.h"
+
+#include <cassert>
 
 void BlockContainer::setBlockId(glm::u8vec3 pos, BlockId block)
 {

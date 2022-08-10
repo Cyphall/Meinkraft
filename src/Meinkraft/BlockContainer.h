@@ -1,9 +1,10 @@
 #pragma once
 
+#include "Meinkraft/Block/BlockDefinition.h"
+#include "Meinkraft/BlockId.h"
+
 #include <array>
 #include <glm/glm.hpp>
-#include "Block/BlockDefinition.h"
-#include "BlockId.h"
 
 class BlockContainer
 {

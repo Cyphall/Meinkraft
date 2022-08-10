@@ -1,14 +1,15 @@
 #pragma once
 
+#include "Meinkraft/WorldGenerator.h"
+#include "Meinkraft/BlockContainer.h"
+#include "Meinkraft/GL/VertexData.h"
+#include "Meinkraft/ChunkBufferSegment.h"
+
 #include <glm/glm.hpp>
 #include <vector>
 #include <glad/gl.h>
 #include <atomic>
 #include <memory>
-#include "WorldGenerator.h"
-#include "BlockContainer.h"
-#include "GL/VertexData.h"
-#include "ChunkBufferSegment.h"
 
 enum class ChunkState
 {

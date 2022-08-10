@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ChunkBufferSegment.h"
+#include "Meinkraft/ChunkBufferSegment.h"
+
 #include <set>
 #include <glad/gl.h>
 #include <memory>

@@ -1,7 +1,8 @@
 #pragma once
 
+#include "Meinkraft/GL/VertexData.h"
+
 #include <vector>
-#include "GL/VertexData.h"
 
 class ChunkBuffer;
 

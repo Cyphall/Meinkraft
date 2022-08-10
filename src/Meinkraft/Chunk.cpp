@@ -1,9 +1,11 @@
 #include "Chunk.h"
-#include "Toolbox.h"
-#include <glm/gtc/matrix_transform.hpp>
+
+#include "Meinkraft/Toolbox.h"
+#include "Meinkraft/Renderer.h"
+#include "Meinkraft/ChunkBufferManager.h"
+
 #include <stdexcept>
-#include "Renderer.h"
-#include "ChunkBufferManager.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 Chunk::Chunk(glm::ivec3 position):
 _position(position)
