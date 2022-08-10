@@ -1,16 +1,13 @@
-#include <iostream>
-#include "Camera.h"
-#include "World.h"
-#include "Renderer.h"
-#include "Toolbox.h"
-#include <format>
+#include "Meinkraft/Camera.h"
+#include "Meinkraft/World.h"
+#include "Meinkraft/Renderer.h"
+#include "Meinkraft/Toolbox.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
-#define GLAD_GL_IMPLEMENTATION
+#include <sstream>
+#include <iostream>
+#include <format>
 #include <glad/gl.h>
-
 #include <GLFW/glfw3.h>
 
 #define VERSION(major, minor, revision) (major * 100 + minor * 10 + revision)

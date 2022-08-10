@@ -1,16 +1,18 @@
 #pragma once
 
-#include "GL/ShaderProgram.h"
-#include "Texture/Block/BlockTexture.h"
-#include "Camera.h"
-#include "ChunkBufferManager.h"
-#include "Texture/Block/BlockTextureManager.h"
+#include "Meinkraft/ChunkBufferManager.h"
+#include "Meinkraft/Texture/Block/BlockTextureManager.h"
+#include "Meinkraft/Camera.h"
+
 #include <memory>
+
+class ShaderProgram;
 
 class Renderer
 {
 public:
 	Renderer();
+	~Renderer();
 	
 	void render();
 	

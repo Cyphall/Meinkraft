@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Meinkraft/GL/VertexData.h"
+#include "Meinkraft/BlockId.h"
+#include "Meinkraft/Block/BlockType.h"
+
 #include <memory>
 #include <array>
 #include <vector>
-#include "BlockType.h"
-#include "../GL/VertexData.h"
-#include "../BlockId.h"
 
 class BlockDefinition
 {
@@ -13,7 +14,7 @@ public:
 	static void init();
 	static BlockDefinition* getBlockDefinition(BlockId blockId);
 	
-	BlockDefinition(BlockType type);
+	explicit BlockDefinition(BlockType type);
 	
 	BlockType getType() const;
 	

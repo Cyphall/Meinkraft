@@ -1,11 +1,14 @@
 #include "Renderer.h"
-#include "World.h"
-#include "Camera.h"
-#include "Toolbox.h"
-#include "GL/Uniforms.h"
+
+#include "Meinkraft/World.h"
+#include "Meinkraft/Toolbox.h"
+#include "Meinkraft/GL/Uniforms.h"
+#include "Meinkraft/ChunkBuffer.h"
+#include "Meinkraft/GL/ShaderProgram.h"
+#include "Meinkraft/GL/ShaderProgramCreateInfo.h"
+
 #include <glad/gl.h>
 #include <glm/gtc/matrix_inverse.hpp>
-#include "ChunkBuffer.h"
 
 Renderer::Renderer()
 {
@@ -115,6 +118,9 @@ Renderer::Renderer()
 	
 	glCreateBuffers(1, &_chunkUniformsBuffer);
 }
+
+Renderer::~Renderer()
+{}
 
 void Renderer::render()
 {

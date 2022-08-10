@@ -1,10 +1,12 @@
 #include "ShaderProgram.h"
+
+#include "Meinkraft/GL/ShaderProgramCreateInfo.h"
+#include "Meinkraft/Helper/ShaderHelper.h"
+#include "Meinkraft/Helper/FileHelper.h"
+#include "Meinkraft/Helper/StringHelper.h"
+
 #include <stdexcept>
 #include <ios>
-#include <sstream>
-#include "../Helper/ShaderHelper.h"
-#include "../Helper/FileHelper.h"
-#include "../Helper/StringHelper.h"
 #include <format>
 #include <numeric>
 #include <glm/gtc/type_ptr.hpp>
@@ -93,7 +95,7 @@ ShaderProgram::ShaderProgram(const ShaderProgramCreateInfo& createInfo)
 		}
 		else
 		{
-			_uniforms[name] = glGetUniformLocation(_handle, name.c_str());;
+			_uniforms[name] = glGetUniformLocation(_handle, name.c_str());
 		}
 	}
 }

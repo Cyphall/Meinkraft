@@ -1,5 +1,6 @@
 #include "MainThreadChunkTaskQueue.h"
 
+#include <format>
 #include <stdexcept>
 #include <magic_enum.hpp>
 

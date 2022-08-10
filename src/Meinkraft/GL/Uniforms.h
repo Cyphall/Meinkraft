@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 struct GlobalUniform
 {
 	glm::mat4 viewProjection;

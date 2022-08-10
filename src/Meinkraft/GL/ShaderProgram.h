@@ -3,9 +3,10 @@
 #include <map>
 #include <vector>
 #include <string>
-#include "glad/gl.h"
-#include "glm/glm.hpp"
-#include "ShaderProgramCreateInfo.h"
+#include <glad/gl.h>
+#include <glm/glm.hpp>
+
+struct ShaderProgramCreateInfo;
 
 class ShaderProgram
 {
@@ -98,5 +99,3 @@ private:
 	
 	int getUniformLocation(const char* name);
 };
-
-

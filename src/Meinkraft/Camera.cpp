@@ -2,6 +2,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Toolbox.h"
 
+#include <GLFW/glfw3.h>
+
 glm::dvec3 Camera::getOrientation()
 {
 	if (_orientationChanged) recalculateOrientation();

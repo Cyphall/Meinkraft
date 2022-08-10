@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../BlockDefinition.h"
+#include "Meinkraft/Block/BlockDefinition.h"
 
 class Air : public BlockDefinition
 {

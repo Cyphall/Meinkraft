@@ -1,7 +1,8 @@
 #pragma once
 
+#include "Meinkraft/Texture/Block/BlockTextureId.h"
+
 #include <glm/glm.hpp>
-#include "../Texture/Block/BlockTextureId.h"
 
 /* faces:
 0: positive x

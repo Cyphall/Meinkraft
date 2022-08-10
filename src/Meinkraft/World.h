@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Meinkraft/Chunk.h"
+#include "Meinkraft/ConcurrentChunkTaskQueue.h"
+#include "Meinkraft/MainThreadChunkTaskQueue.h"
+
+#include <thread>
 #include <glm/glm.hpp>
 #include <glm/gtx/hash.hpp>
 #include <unordered_map>
-#include "Chunk.h"
-#include "ConcurrentChunkTaskQueue.h"
-#include "MainThreadChunkTaskQueue.h"
-#include <thread>
 
 class World
 {

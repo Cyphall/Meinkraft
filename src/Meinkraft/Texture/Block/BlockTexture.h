@@ -8,8 +8,12 @@ class BlockTexture
 {
 public:
 	explicit BlockTexture(const std::string& name);
+	
 	BlockTexture(const BlockTexture& other) = delete;
+	BlockTexture& operator=(const BlockTexture& other) = delete;
+	
 	BlockTexture(BlockTexture&& other);
+	BlockTexture& operator=(BlockTexture&& other);
 	
 	~BlockTexture();
 	
@@ -23,5 +27,3 @@ private:
 	
 	static int calculateMipmapCount(const glm::ivec2& size);
 };
-
-

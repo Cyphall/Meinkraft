@@ -1,4 +1,5 @@
 #include "SpecHelper.h"
+
 #include <Windows.h>
 #include <vector>
 

@@ -1,8 +1,9 @@
 #include "BlockDefinition.h"
-#include "BlockDefinition/Air.h"
-#include "BlockDefinition/Stone.h"
-#include "BlockDefinition/Dirt.h"
-#include "BlockDefinition/Grass.h"
+
+#include "Meinkraft/Block/BlockDefinition/Air.h"
+#include "Meinkraft/Block/BlockDefinition/Stone.h"
+#include "Meinkraft/Block/BlockDefinition/Dirt.h"
+#include "Meinkraft/Block/BlockDefinition/Grass.h"
 
 void BlockDefinition::init()
 {

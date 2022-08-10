@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <GLFW/glfw3.h>
 
+struct GLFWwindow;
 class World;
 class Camera;
 class Renderer;
