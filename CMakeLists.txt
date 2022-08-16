@@ -35,5 +35,6 @@ target_include_directories(Meinkraft SYSTEM PRIVATE "vendor/glad/include")
 target_include_directories(Meinkraft SYSTEM PRIVATE "vendor/imgui-1.79/include")
 target_include_directories(Meinkraft SYSTEM PRIVATE "vendor/fast_noise_lite/include")
 
-add_custom_command(TARGET Meinkraft POST_BUILD
+add_custom_target(copy_resources
 		COMMAND robocopy ${PROJECT_SOURCE_DIR}/resources/ ${PROJECT_BINARY_DIR}/resources /E /NS /NC /NFL /NDL /NP /NJH /NJS || cmd /c "exit /b 0")
+add_dependencies(Meinkraft copy_resources)
