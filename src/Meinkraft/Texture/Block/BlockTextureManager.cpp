@@ -15,6 +15,7 @@ BlockTextureManager::BlockTextureManager()
 		textureHandles.push_back(texture.getBindlessHandle());
 	}
 	glNamedBufferStorage(_texturesBuffer, textureHandles.size() * sizeof(GLuint64), textureHandles.data(), 0);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, _texturesBuffer);
 }
 
 BlockTextureManager::~BlockTextureManager()

@@ -1,36 +1,27 @@
-#include "Renderer.h"
+#include "ChunksPass.h"
 
+#include "Meinkraft/Chunk.h"
 #include "Meinkraft/World.h"
-#include "Meinkraft/Toolbox.h"
-#include "Meinkraft/GL/Uniforms.h"
 #include "Meinkraft/ChunkBuffer.h"
-#include "Meinkraft/GL/ShaderProgram.h"
+#include "Meinkraft/ChunkBufferManager.h"
+#include "Meinkraft/Toolbox.h"
+#include "Meinkraft/GL/VertexData.h"
 #include "Meinkraft/GL/ShaderProgramCreateInfo.h"
+#include "Meinkraft/GL/ShaderProgram.h"
 
-#include <glad/gl.h>
 #include <glm/gtc/matrix_inverse.hpp>
 
-Renderer::Renderer()
+ChunksPass::ChunksPass()
 {
 	// ========== SHADERS ==========
 	
-	{
-		ShaderProgramCreateInfo createInfo;
-		createInfo.shadersFiles[GL_VERTEX_SHADER].emplace_back("forward");
-		createInfo.shadersFiles[GL_FRAGMENT_SHADER].emplace_back("forward");
-		
-		_forwardShader = std::make_unique<ShaderProgram>(createInfo);
-	}
+	ShaderProgramCreateInfo createInfo;
+	createInfo.shadersFiles[GL_VERTEX_SHADER].emplace_back("forward");
+	createInfo.shadersFiles[GL_FRAGMENT_SHADER].emplace_back("forward");
 	
-	{
-		ShaderProgramCreateInfo createInfo;
-		createInfo.shadersFiles[GL_VERTEX_SHADER].emplace_back("skybox");
-		createInfo.shadersFiles[GL_FRAGMENT_SHADER].emplace_back("skybox");
-		
-		_skyboxShader = std::make_unique<ShaderProgram>(createInfo);
-	}
+	_forwardShader = std::make_unique<ShaderProgram>(createInfo);
 	
-	// ========== MAIN VAO ==========
+	// ========== VAOS ==========
 	
 	glCreateVertexArrays(1, &_blocksVao);
 	
@@ -50,103 +41,22 @@ Renderer::Renderer()
 	glVertexArrayAttribIFormat(_blocksVao, 3, 1, GL_UNSIGNED_BYTE, offsetof(VertexData, texture));
 	glEnableVertexArrayAttrib(_blocksVao, 3);
 	
-	// ========== SKYBOX VAO ==========
-	
-	glCreateVertexArrays(1, &_skyboxVao);
-	
-	glVertexArrayAttribBinding(_skyboxVao, 0, 0);
-	glVertexArrayAttribIFormat(_skyboxVao, 0, 3, GL_BYTE, 0);
-	glEnableVertexArrayAttrib(_skyboxVao, 0);
-	
-	// ========== SKYBOX VBO ==========
-	
-	std::vector<glm::i8vec3> skyboxData = {
-		{-1,  1, -1},
-		{-1, -1, -1},
-		{ 1, -1, -1},
-		{ 1, -1, -1},
-		{ 1,  1, -1},
-		{-1,  1, -1},
-		
-		{-1, -1,  1},
-		{-1, -1, -1},
-		{-1,  1, -1},
-		{-1,  1, -1},
-		{-1,  1,  1},
-		{-1, -1,  1},
-		
-		{ 1, -1, -1},
-		{ 1, -1,  1},
-		{ 1,  1,  1},
-		{ 1,  1,  1},
-		{ 1,  1, -1},
-		{ 1, -1, -1},
-		
-		{-1, -1,  1},
-		{-1,  1,  1},
-		{ 1,  1,  1},
-		{ 1,  1,  1},
-		{ 1, -1,  1},
-		{-1, -1,  1},
-		
-		{-1,  1, -1},
-		{ 1,  1, -1},
-		{ 1,  1,  1},
-		{ 1,  1,  1},
-		{-1,  1,  1},
-		{-1,  1, -1},
-		
-		{-1, -1, -1},
-		{-1, -1,  1},
-		{ 1, -1, -1},
-		{ 1, -1, -1},
-		{-1, -1,  1},
-		{ 1, -1,  1}
-	};
-	
-	glCreateBuffers(1, &_skyboxVbo);
-	glNamedBufferStorage(_skyboxVbo, skyboxData.size() * sizeof(glm::i8vec3), skyboxData.data(), 0);
-	
-	glVertexArrayVertexBuffer(_skyboxVao, 0, _skyboxVbo, 0, sizeof(glm::i8vec3));
-	
-	// ========== GLOBAL UNIFORMS SSBO ==========
+	// ========== UNIFORM STORAGE BUFFERS ==========
 	
 	glCreateBuffers(1, &_globalUniformBuffer);
 	glNamedBufferStorage(_globalUniformBuffer, sizeof(GlobalUniform), nullptr, GL_DYNAMIC_STORAGE_BIT);
 	
-	// ========== CHUNK UNIFORMS SSBO ==========
-	
 	glCreateBuffers(1, &_chunkUniformsBuffer);
 }
 
-Renderer::~Renderer()
-{}
-
-void Renderer::render()
+ChunksPass::~ChunksPass()
 {
-	renderChunks();
-	renderSkybox();
+	glDeleteBuffers(1, &_chunkUniformsBuffer);
+	glDeleteBuffers(1, &_globalUniformBuffer);
+	glDeleteVertexArrays(1, &_blocksVao);
 }
 
-bool Renderer::isInFrustum(glm::dvec3 chunkCenterPos, const glm::mat4& vp, const std::array<FrustumPlane, 4>& frustumPlanes)
-{
-	for (const FrustumPlane& plane : frustumPlanes)
-	{
-		if (glm::dot(chunkCenterPos - (plane.position - plane.normal * CHUNK_FRUSTUM_TEST_OFFSET), plane.normal) < 0)
-		{
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-ChunkBufferManager& Renderer::getChunkBufferManager()
-{
-	return _chunkBufferManager;
-}
-
-void Renderer::renderChunks()
+void ChunksPass::render(const ChunkBufferManager& chunkBufferManager)
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -164,7 +74,7 @@ void Renderer::renderChunks()
 	
 	std::map<const ChunkBuffer*, std::vector<const Chunk*>> chunksToDraw;
 	int maxChunkCount = 0;
-	for (auto& buffer : _chunkBufferManager.getBuffers())
+	for (auto& buffer : chunkBufferManager.getBuffers())
 	{
 		int chunkCount = buffer->getActiveSegmentCount();
 		chunksToDraw[buffer.get()].reserve(chunkCount);
@@ -184,12 +94,10 @@ void Renderer::renderChunks()
 	}
 	
 	glNamedBufferSubData(_globalUniformBuffer, 0, sizeof(GlobalUniform), &globalUniform);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, _globalUniformBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _globalUniformBuffer);
 	
 	glNamedBufferData(_chunkUniformsBuffer, maxChunkCount * sizeof(ChunkUniform), nullptr, GL_DYNAMIC_DRAW);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, _chunkUniformsBuffer);
-	
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _blockTextureManager.getBuffer());
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, _chunkUniformsBuffer);
 	
 	_forwardShader->bind();
 	
@@ -228,25 +136,15 @@ void Renderer::renderChunks()
 	glFrontFace(GL_CCW);
 }
 
-void Renderer::renderSkybox()
+bool ChunksPass::isInFrustum(glm::dvec3 chunkCenterPos, const glm::mat4& vp, const std::array<FrustumPlane, 4>& frustumPlanes)
 {
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glDepthMask(GL_FALSE);
+	for (const FrustumPlane& plane : frustumPlanes)
+	{
+		if (glm::dot(chunkCenterPos - (plane.position - plane.normal * CHUNK_FRUSTUM_TEST_OFFSET), plane.normal) < 0)
+		{
+			return false;
+		}
+	}
 	
-	glBindVertexArray(_skyboxVao);
-	
-	_skyboxShader->bind();
-	
-	glm::mat4 mvp =
-		Toolbox::camera->getProjection() *
-		glm::mat4(glm::mat3(Toolbox::camera->getView()));
-	
-	_skyboxShader->setUniform("u_mvp", mvp);
-	
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	
-	glDisable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glDepthMask(GL_TRUE);
+	return true;
 }

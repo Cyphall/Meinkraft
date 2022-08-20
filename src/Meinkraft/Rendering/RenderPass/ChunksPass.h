@@ -1,40 +1,41 @@
 #pragma once
 
-#include "Meinkraft/ChunkBufferManager.h"
-#include "Meinkraft/Texture/Block/BlockTextureManager.h"
+#include "Meinkraft/Rendering/RenderPass/RenderPass.h"
 #include "Meinkraft/Camera.h"
 
+#include <glm/glm.hpp>
+#include <glad/gl.h>
 #include <memory>
 
 class ShaderProgram;
 
-class Renderer
+class ChunksPass : public RenderPass
 {
 public:
-	Renderer();
-	~Renderer();
+	ChunksPass();
+	~ChunksPass() override;
 	
-	void render();
+	void render(const ChunkBufferManager& chunkBufferManager) override;
 	
-	ChunkBufferManager& getChunkBufferManager();
-
 private:
+	struct GlobalUniform
+	{
+		glm::mat4 viewProjection;
+		glm::vec3 viewPos;
+		float padding;
+	};
+	
+	struct ChunkUniform
+	{
+		glm::mat4 model;
+		glm::mat4 normalMatrix;
+	};
+	
 	std::unique_ptr<ShaderProgram> _forwardShader;
 	GLuint _blocksVao;
 	
-	std::unique_ptr<ShaderProgram> _skyboxShader;
-	GLuint _skyboxVao;
-	GLuint _skyboxVbo;
-	
 	GLuint _globalUniformBuffer;
 	GLuint _chunkUniformsBuffer;
-	
-	ChunkBufferManager _chunkBufferManager;
-	
-	BlockTextureManager _blockTextureManager;
-	
-	void renderChunks();
-	void renderSkybox();
 	
 	bool isInFrustum(glm::dvec3 chunkCenterPos, const glm::mat4& vp, const std::array<FrustumPlane, 4>& frustumPlanes);
 	

@@ -1,7 +1,7 @@
 #include "Chunk.h"
 
 #include "Meinkraft/Toolbox.h"
-#include "Meinkraft/Renderer.h"
+#include "Meinkraft/Rendering/Renderer.h"
 #include "Meinkraft/ChunkBufferManager.h"
 
 #include <stdexcept>

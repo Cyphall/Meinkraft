@@ -24,12 +24,12 @@ layout(location = 3) in uint i_textureId;
 
 // ---------- UNIFORMS ----------
 
-layout(std430, binding = 0) buffer _0
+layout(std430, binding = 1) buffer _0
 {
 	GlobalUniform globalUniform;
 };
 
-layout(std430, binding = 1) buffer _1
+layout(std430, binding = 2) buffer _1
 {
 	ChunkUniform chunkUniforms[];
 };

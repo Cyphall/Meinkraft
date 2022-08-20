@@ -1,6 +1,6 @@
 #include "Meinkraft/Camera.h"
 #include "Meinkraft/World.h"
-#include "Meinkraft/Renderer.h"
+#include "Meinkraft/Rendering/Renderer.h"
 #include "Meinkraft/Toolbox.h"
 
 #include <stb_image.h>
