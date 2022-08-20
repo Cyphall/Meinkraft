@@ -1,6 +1,6 @@
 #include "BlockTextureManager.h"
 
-#include <array>
+#include <vector>
 
 BlockTextureManager::BlockTextureManager()
 {
@@ -8,12 +8,13 @@ BlockTextureManager::BlockTextureManager()
 	
 	glCreateBuffers(1, &_texturesBuffer);
 	
-	std::array<GLuint64, std::numeric_limits<uint8_t>::max()> textureHandles{};
+	std::vector<GLuint64> textureHandles;
 	for (const auto& [id, texture] : _textures)
 	{
-		textureHandles[static_cast<uint8_t>(id)] = texture.getBindlessHandle();
+		assert(textureHandles.size() == static_cast<uint8_t>(id));
+		textureHandles.push_back(texture.getBindlessHandle());
 	}
-	glNamedBufferStorage(_texturesBuffer, textureHandles.size() * sizeof(uint8_t), textureHandles.data(), 0);
+	glNamedBufferStorage(_texturesBuffer, textureHandles.size() * sizeof(GLuint64), textureHandles.data(), 0);
 }
 
 BlockTextureManager::~BlockTextureManager()
