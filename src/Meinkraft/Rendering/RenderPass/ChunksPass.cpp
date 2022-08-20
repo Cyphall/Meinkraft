@@ -56,7 +56,7 @@ ChunksPass::~ChunksPass()
 	glDeleteVertexArrays(1, &_blocksVao);
 }
 
-void ChunksPass::render(const ChunkBufferManager& chunkBufferManager)
+void ChunksPass::render()
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -74,7 +74,7 @@ void ChunksPass::render(const ChunkBufferManager& chunkBufferManager)
 	
 	std::map<const ChunkBuffer*, std::vector<const Chunk*>> chunksToDraw;
 	int maxChunkCount = 0;
-	for (auto& buffer : chunkBufferManager.getBuffers())
+	for (auto& buffer : Toolbox::chunkBufferManager->getBuffers())
 	{
 		int chunkCount = buffer->getActiveSegmentCount();
 		chunksToDraw[buffer.get()].reserve(chunkCount);

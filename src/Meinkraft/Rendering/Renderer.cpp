@@ -14,11 +14,6 @@ Renderer::~Renderer()
 
 void Renderer::render()
 {
-	_chunksPass->render(_chunkBufferManager);
-	_skyboxPass->render(_chunkBufferManager);
-}
-
-ChunkBufferManager& Renderer::getChunkBufferManager()
-{
-	return _chunkBufferManager;
+	_chunksPass->render();
+	_skyboxPass->render();
 }

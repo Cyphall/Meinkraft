@@ -16,13 +16,8 @@ public:
 	~Renderer();
 	
 	void render();
-	
-	ChunkBufferManager& getChunkBufferManager();
 
 private:
-	ChunkBufferManager _chunkBufferManager;
-	BlockTextureManager _blockTextureManager;
-	
 	std::unique_ptr<ChunksPass> _chunksPass;
 	std::unique_ptr<SkyboxPass> _skyboxPass;
 };

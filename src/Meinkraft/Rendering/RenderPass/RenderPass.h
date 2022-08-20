@@ -8,5 +8,5 @@ public:
 	RenderPass() = default;
 	virtual ~RenderPass() = default;
 	
-	virtual void render(const ChunkBufferManager& chunkBufferManager) = 0;
+	virtual void render() = 0;
 };

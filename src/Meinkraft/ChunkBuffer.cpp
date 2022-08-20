@@ -31,7 +31,6 @@ bool ChunkBuffer::tryAcquireAvailableSegment(std::unique_ptr<ChunkBufferSegment>
 
 void ChunkBuffer::releaseMemory(ChunkBufferSegment* segment)
 {
-	glInvalidateBufferSubData(_vbo, segment->getStartIndex() * sizeof(VertexData), segment->getVertexCount() * sizeof(VertexData));
 	_bufferSegments.erase(segment);
 }
 

@@ -60,7 +60,7 @@ void Chunk::reserveBufferSegment()
 	
 	_bufferSegment.reset();
 	
-	Toolbox::renderer->getChunkBufferManager().acquireAvailableSegment(_bufferSegment, _temporaryRamBuffer.size());
+	Toolbox::chunkBufferManager->acquireAvailableSegment(_bufferSegment, _temporaryRamBuffer.size());
 	
 	_state = ChunkState::WAITING_MESH_UPLOAD;
 }

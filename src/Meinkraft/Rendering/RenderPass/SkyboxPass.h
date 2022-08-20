@@ -14,7 +14,7 @@ public:
 	SkyboxPass();
 	~SkyboxPass() override;
 	
-	void render(const ChunkBufferManager& chunkBufferManager) override;
+	void render() override;
 
 private:
 	struct GlobalUniform

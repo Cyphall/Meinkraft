@@ -146,15 +146,9 @@ int main(int argc, char** argv)
 	BlockDefinition::init();
 	
 	Toolbox::camera = std::make_unique<Camera>(glm::dvec3(8, 170, 8));
-	try
-	{
-		Toolbox::renderer = std::make_unique<Renderer>();
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << e.what() << std::endl;
-		throw e;
-	}
+	Toolbox::chunkBufferManager = std::make_unique<ChunkBufferManager>();
+	Toolbox::blockTextureManager = std::make_unique<BlockTextureManager>();
+	Toolbox::renderer = std::make_unique<Renderer>();
 	Toolbox::world = std::make_unique<World>();
 	
 	double previousTime = 0;
@@ -191,6 +185,8 @@ int main(int argc, char** argv)
 	
 	Toolbox::world.reset();
 	Toolbox::renderer.reset();
+	Toolbox::blockTextureManager.reset();
+	Toolbox::chunkBufferManager.reset();
 	Toolbox::camera.reset();
 	
 	glfwTerminate();

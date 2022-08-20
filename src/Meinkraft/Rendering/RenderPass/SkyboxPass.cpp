@@ -84,7 +84,7 @@ SkyboxPass::~SkyboxPass()
 	glDeleteVertexArrays(1, &_skyboxVao);
 }
 
-void SkyboxPass::render(const ChunkBufferManager& chunkBufferManager)
+void SkyboxPass::render()
 {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
