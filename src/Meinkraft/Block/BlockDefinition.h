@@ -7,25 +7,13 @@
 #include <memory>
 #include <array>
 #include <vector>
+#include <functional>
 
-class BlockDefinition
+struct VertexGenerationInfo;
+
+struct BlockDefinition
 {
-public:
-	static void init();
-	static BlockDefinition* getBlockDefinition(BlockId blockId);
-	
-	explicit BlockDefinition(BlockType type);
-	
-	BlockType getType() const;
-	
-	
-	virtual void genVertices(std::vector<VertexData>& vertices, glm::u8vec3 pos, BlockType xp1, BlockType xm1, BlockType yp1, BlockType ym1, BlockType zp1, BlockType zm1) = 0;
-	
-protected:
-	BlockType _type;
-	
-private:
-	static inline std::array<std::unique_ptr<BlockDefinition>, 256> _blocks{};
-	
-	
+	BlockType type;
+	void (*vertexGenerator)(std::vector<VertexData>& output, glm::u8vec3 pos, BlockType xp1, BlockType xm1, BlockType yp1, BlockType ym1, BlockType zp1, BlockType zm1, const std::unordered_map<std::string_view, BlockTextureId>& textures);
+	std::unordered_map<std::string_view, BlockTextureId> textures;
 };

@@ -2,6 +2,7 @@
 #include "Meinkraft/World.h"
 #include "Meinkraft/Rendering/Renderer.h"
 #include "Meinkraft/Toolbox.h"
+#include "Meinkraft/Block/BlockManager.h"
 
 #include <stb_image.h>
 #include <sstream>
@@ -143,7 +144,7 @@ int main(int argc, char** argv)
 #endif
 	glDebugMessageCallback(messageCallback, nullptr);
 	
-	BlockDefinition::init();
+	BlockManager::init();
 	
 	Toolbox::camera = std::make_unique<Camera>(glm::dvec3(8, 170, 8));
 	Toolbox::chunkBufferManager = std::make_unique<ChunkBufferManager>();

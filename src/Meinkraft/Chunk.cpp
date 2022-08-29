@@ -33,14 +33,15 @@ void Chunk::generateMesh()
 		{
 			for (pos.x = 0; pos.x < 16; pos.x++)
 			{
-				BlockType xp1 = pos.x < 15 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(+1, 0, 0))->getType() : BlockType::TRANSPARENT;
-				BlockType xm1 = pos.x > 0 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(-1, 0, 0))->getType() : BlockType::TRANSPARENT;
-				BlockType yp1 = pos.y < 15 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(0, +1, 0))->getType() : BlockType::TRANSPARENT;
-				BlockType ym1 = pos.y > 0 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(0, -1, 0))->getType() : BlockType::TRANSPARENT;
-				BlockType zp1 = pos.z < 15 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(0, 0, +1))->getType() : BlockType::TRANSPARENT;
-				BlockType zm1 = pos.z > 0 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(0, 0, -1))->getType() : BlockType::TRANSPARENT;
+				BlockType xp1 = pos.x < 15 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(+1, 0, 0)).type : BlockType::TRANSPARENT;
+				BlockType xm1 = pos.x > 0 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(-1, 0, 0)).type : BlockType::TRANSPARENT;
+				BlockType yp1 = pos.y < 15 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(0, +1, 0)).type : BlockType::TRANSPARENT;
+				BlockType ym1 = pos.y > 0 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(0, -1, 0)).type : BlockType::TRANSPARENT;
+				BlockType zp1 = pos.z < 15 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(0, 0, +1)).type : BlockType::TRANSPARENT;
+				BlockType zm1 = pos.z > 0 ? _blockContainer.getBlockDefinition(pos + glm::u8vec3(0, 0, -1)).type : BlockType::TRANSPARENT;
 				
-				_blockContainer.getBlockDefinition(pos)->genVertices(_temporaryRamBuffer, pos, xp1, xm1, yp1, ym1, zp1, zm1);
+				BlockDefinition& blockDefinition = _blockContainer.getBlockDefinition(pos);
+				blockDefinition.vertexGenerator(_temporaryRamBuffer, pos, xp1, xm1, yp1, ym1, zp1, zm1, blockDefinition.textures);
 			}
 		}
 	}

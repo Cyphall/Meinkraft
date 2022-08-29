@@ -1,6 +1,6 @@
 #include "BlockContainer.h"
 
-#include "Meinkraft/Helper/MathHelper.h"
+#include "Meinkraft/Block/BlockManager.h"
 
 #include <cassert>
 
@@ -30,8 +30,8 @@ glm::u8vec3 BlockContainer::indexToPos(int index)
 	return glm::u8vec3(index % 16, (index/16) % 16, (index/256) % 16);
 }
 
-BlockDefinition* BlockContainer::getBlockDefinition(glm::u8vec3 pos) const
+BlockDefinition& BlockContainer::getBlockDefinition(glm::u8vec3 pos) const
 {
 	BlockId blockId = getBlockId(pos);
-	return BlockDefinition::getBlockDefinition(blockId);
+	return BlockManager::getBlockDefinition(blockId);
 }
