@@ -1,5 +1,5 @@
 # Meinkraft
-Meinkraft is a Minecraft-like project made to experiment with the ~~Nvidia extensions that Vulkanize OpenGL~~ modern GL commands made to accelerate drawcalls.<br/>
+Meinkraft is a Minecraft-like rendering project made to experiment with the ~~Nvidia extensions that Vulkanize OpenGL~~ modern GL commands made to accelerate drawcalls.<br/>
 This is a full C++ rewrite of my original C# Meinkraft project.
 
 ## Controls
